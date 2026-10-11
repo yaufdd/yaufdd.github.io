@@ -1,0 +1,73 @@
+---
+import type { Locale } from '../i18n/ui';
+import { formatPeriod, formatTeam, t } from '../i18n/utils';
+import type { Project } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+  data: Project['data'];
+}
+const { locale, data } = Astro.props;
+---
+<section class="meta" aria-labelledby="overview-title">
+  <h2 id="overview-title" class="section-title">{t(locale, 'project.overview')}</h2>
+  <dl>
+    <div><dt>{t(locale, 'project.period')}</dt><dd>{formatPeriod(data.period, locale)}</dd></div>
+    <div><dt>{t(locale, 'project.team')}</dt><dd>{formatTeam(data.team, locale)}</dd></div>
+    <div><dt>{t(locale, 'project.status')}</dt><dd>{t(locale, data.status === 'active' ? 'project.statusActive' : 'project.statusArchived')}</dd></div>
+    <div>
+      <dt>{t(locale, 'project.roles')}</dt>
+      <dd><ul class="roles">{data.roles.map((role) => <li>{role}</li>)}</ul></dd>
+    </div>
+    <div>
+      <dt>{t(locale, 'project.stack')}</dt>
+      <dd><ul class="tags">{data.stack.map((item) => <li>{item}</li>)}</ul></dd>
+    </div>
+    {data.devProcess && <div><dt>{t(locale, 'project.devProcess')}</dt><dd>{data.devProcess}</dd></div>}
+  </dl>
+  {data.links.live && <a class="live mono" href={data.links.live} target="_blank" rel="noopener">{t(locale, 'project.live')} ↗</a>}
+</section>
+
+<style>
+  .meta {
+    margin: 32px 0;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  dl {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+  dl > div {
+    display: grid;
+    gap: 2px;
+  }
+  @media (min-width: 720px) {
+    dl > div {
+      grid-template-columns: 9em 1fr;
+      gap: 16px;
+    }
+  }
+  dt {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  dd {
+    margin: 0;
+  }
+  .roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .live {
+    display: inline-block;
+    margin-top: 16px;
+  }
+</style>

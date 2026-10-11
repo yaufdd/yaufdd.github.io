@@ -1,0 +1,85 @@
+.prose {
+  line-height: 1.9;
+}
+.prose h2 {
+  margin: 48px 0 16px;
+  font-family: 'JetBrains Mono', 'Noto Sans JP', ui-monospace, monospace;
+  font-size: 18px;
+}
+.prose h2::before {
+  content: '## ';
+  color: var(--accent);
+}
+.prose h3 {
+  margin: 28px 0 8px;
+  font-size: 16px;
+}
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 16px;
+}
+.prose li {
+  margin-bottom: 6px;
+}
+.prose code {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.9em;
+}
+.prose img {
+  display: block;
+  margin: 8px 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: zoom-in;
+}
+
+/* Architecture diagrams: inline SVG in Markdown, coloured by the active theme. */
+.prose .diagram {
+  max-width: 520px;
+  margin: 24px auto;
+}
+.prose .diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.prose .diagram figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+.diagram .d-box {
+  fill: var(--card);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+.diagram .d-accent {
+  fill: var(--card);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+.diagram .d-line {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+.diagram .d-arrow {
+  fill: var(--muted);
+}
+.diagram .d-text {
+  fill: var(--fg);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+.diagram .d-mono {
+  fill: var(--muted);
+  font-family: 'JetBrains Mono', 'Noto Sans JP', monospace;
+  font-size: 11px;
+}

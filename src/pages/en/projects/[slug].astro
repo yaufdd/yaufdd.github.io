@@ -1,0 +1,15 @@
+---
+import { getProjects, slugOf, type Project } from '../../../lib/content';
+import ProjectPage from '../../../views/ProjectPage.astro';
+
+export async function getStaticPaths() {
+  const projects = await getProjects('en');
+  return projects.map((entry) => ({ params: { slug: slugOf(entry) }, props: { entry } }));
+}
+
+interface Props {
+  entry: Project;
+}
+const { entry } = Astro.props;
+---
+<ProjectPage locale="en" entry={entry} />
