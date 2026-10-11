@@ -1,0 +1,23 @@
+---
+import { localizePath, t } from '../i18n/utils';
+import Base from '../layouts/Base.astro';
+---
+<Base locale="ja" path="" title={t('ja', 'notFound.title')} description={t('ja', 'notFound.text')} noindex>
+  <section class="container notfound">
+    <p class="crumb">404: no such file or directory</p>
+    <h1 class="page-title">{t('ja', 'notFound.title')}</h1>
+    <p class="muted" lang="en">{t('en', 'notFound.title')}</p>
+    <p>{t('ja', 'notFound.text')}</p>
+    <p class="mono">
+      <a href={localizePath('ja', '')}>{t('ja', 'notFound.home')}</a>
+      ·
+      <a href={localizePath('en', '')} lang="en">{t('en', 'notFound.home')}</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    padding-bottom: 64px;
+  }
+</style>

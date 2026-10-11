@@ -1,0 +1,51 @@
+---
+import '../styles/prose.css';
+import { render } from 'astro:content';
+import { contacts } from '../data/profile';
+import type { Locale } from '../i18n/ui';
+import { t } from '../i18n/utils';
+import Base from '../layouts/Base.astro';
+import { getPage } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const { Content: About } = await render(await getPage('about', locale));
+const { Content: Workflow } = await render(await getPage('workflow', locale));
+---
+<Base locale={locale} path="about/" title={t(locale, 'about.title')} description={t(locale, 'about.description')}>
+  <article class="container page">
+    <p class="crumb">~/about</p>
+    <h1 class="page-title">{t(locale, 'about.title')}</h1>
+    <div class="prose"><About /></div>
+
+    <section id="workflow" class="prose" aria-labelledby="workflow-title">
+      <h2 id="workflow-title">{t(locale, 'about.workflow')}</h2>
+      <Workflow />
+    </section>
+
+    <section class="contacts" aria-labelledby="contacts-title">
+      <h2 id="contacts-title" class="section-title">{t(locale, 'about.contacts')}</h2>
+      <ul class="mono">
+        <li><a href={contacts.github}>github.com/yaufdd</a></li>
+        {contacts.email && <li><a href={`mailto:${contacts.email}`}>{contacts.email}</a></li>}
+      </ul>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .page {
+    padding-bottom: 64px;
+  }
+  .contacts {
+    margin-top: 48px;
+  }
+  .contacts ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+  }
+</style>
