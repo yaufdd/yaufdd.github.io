@@ -30,4 +30,12 @@ npm run test:e2e                   # build + browser tests
 
 ## Content checks
 
-CI fails if the built site or the source mentions a term from a private list (repository secret `FORBIDDEN_TERMS`, one term per line; locally `forbidden.local.txt`, gitignored).
+A private list of terms must never appear anywhere public (repository secret `FORBIDDEN_TERMS`, one term per line; locally `forbidden.local.txt`, gitignored). Matching ignores case, full-width forms, punctuation, whitespace and inline HTML tags.
+
+```bash
+npm run check:forbidden                          # every tracked or new file + the built site (CI runs this too)
+npm run check:forbidden -- --history --all       # every file version, commit message and author in history
+git config core.hooksPath .githooks              # once per clone: the pre-push hook runs the history check
+```
+
+CI only sees a commit after it is public, so the pre-push hook is the real gate.

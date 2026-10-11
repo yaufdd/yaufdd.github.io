@@ -1,0 +1,19 @@
+#!/bin/sh
+# Blocks a push if any commit being pushed — file contents at every step, messages, author/committer — contains
+# a term from the private forbidden list. CI only checks after the push, when the text is already public.
+# Enable once per clone:  git config core.hooksPath .githooks
+zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
+root=$(git rev-parse --show-toplevel)
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue # deleting a remote branch pushes no content
+  if [ "$remote_sha" = "$zero" ]; then
+    range="$local_sha" # new branch on the remote: everything reachable from it
+  else
+    range="$remote_sha..$local_sha"
+  fi
+  node "$root/scripts/check-forbidden.mjs" --history "$range" || {
+    echo "pre-push: blocked $local_ref — remove the term from history (not just from the latest commit) and retry." >&2
+    exit 1
+  }
+done
