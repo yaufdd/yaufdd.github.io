@@ -1,19 +1,48 @@
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 
-test('home lists the projects in order and links to them', async ({ page }) => {
-  await page.goto('/');
-  const cards = page.locator('#projects .card');
-  await expect(cards).toHaveCount(2);
-  await expect(cards.nth(0)).toContainText('ビザ申請書類');
-  await expect(cards.nth(1)).toContainText('pacxpuctanno');
-  await cards.nth(0).click();
-  await expect(page).toHaveURL('/projects/visa-docs/');
-});
+const ROOT = 'src/content/projects';
 
-test('english home links to english cases', async ({ page }) => {
+/** Card links the home page should show, derived from the content files so new projects need no test changes. */
+function expectedCardLinks(locale: 'ja' | 'en'): string[] {
+  const prefix = locale === 'ja' ? '/' : '/en/';
+  const projects = readdirSync(ROOT, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => {
+      const frontmatter = (slug: string, l: string) => readFileSync(join(ROOT, slug, `${l}.md`), 'utf8').split(/\n---/)[0] ?? '';
+      const ja = frontmatter(d.name, 'ja');
+      const en = frontmatter(d.name, 'en');
+      const own = locale === 'ja' ? ja : en;
+      return {
+        slug: d.name,
+        order: Number(/^order:\s*(-?\d+)/m.exec(own)?.[1]),
+        draft: [ja, en].some((fm) => /^draft:\s*true/m.test(fm)),
+      };
+    })
+    .filter((p) => !p.draft)
+    .sort((a, b) => a.order - b.order || a.slug.localeCompare(b.slug));
+  return projects.map((p) => `${prefix}projects/${p.slug}/`);
+}
+
+for (const locale of ['ja', 'en'] as const) {
+  test(`${locale} home lists every project in display order and links to it`, async ({ page }) => {
+    const expected = expectedCardLinks(locale);
+    expect(expected.length).toBeGreaterThan(0);
+    await page.goto(locale === 'ja' ? '/' : '/en/');
+    const cards = page.locator('#projects .card');
+    await expect(cards).toHaveCount(expected.length);
+    expect(await cards.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual(expected);
+    await cards.first().click();
+    await expect(page).toHaveURL(expected[0]!);
+  });
+}
+
+test('cards show the localized project titles', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#projects .card', { hasText: 'ビザ申請書類' })).toHaveCount(1);
   await page.goto('/en/');
-  await expect(page.locator('#projects .card').first()).toHaveAttribute('href', '/en/projects/visa-docs/');
-  await expect(page.locator('#projects .card').first()).toContainText('Visa Document Automation');
+  await expect(page.locator('#projects .card', { hasText: 'Visa Document Automation' })).toHaveCount(1);
 });
 
 test('stack shows AI dev tools as their own group', async ({ page }) => {
