@@ -1,0 +1,61 @@
+---
+import { THEMES } from '../lib/theme';
+
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+<div class="themes" role="group" aria-label={label}>
+  {THEMES.map((theme) => <button type="button" data-theme-option={theme} aria-pressed="false">{theme}</button>)}
+</div>
+
+<script>
+  import { parseTheme, safeLocalStorage, writeTheme, type Theme } from '../lib/theme';
+
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-option]');
+
+  function apply(theme: Theme) {
+    root.dataset.theme = theme;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeOption === theme)));
+  }
+
+  apply(parseTheme(root.dataset.theme));
+  buttons.forEach((button) =>
+    button.addEventListener('click', () => {
+      const theme = parseTheme(button.dataset.themeOption);
+      apply(theme);
+      writeTheme(safeLocalStorage(), theme);
+    }),
+  );
+</script>
+
+<style>
+  .themes {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  /* Without JS the init script never runs, so there is no data-theme and the buttons would do nothing. */
+  :global(html:not([data-theme])) .themes {
+    display: none;
+  }
+  button {
+    padding: 3px 8px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  button[aria-pressed='true'] {
+    background: var(--bg);
+    color: var(--accent);
+  }
+</style>

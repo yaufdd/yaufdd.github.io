@@ -1,0 +1,62 @@
+---
+import '../styles/tokens.css';
+import '../styles/global.css';
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import Footer from '../components/Footer.astro';
+import Nav from '../components/Nav.astro';
+import defaultOgImage from '../assets/og-default.png';
+import { LOCALES, type Locale } from '../i18n/ui';
+import { localizePath, t } from '../i18n/utils';
+import { themeInitScript } from '../lib/theme';
+
+interface Props {
+  locale: Locale;
+  /** Locale-neutral path of this page: '' for home, 'about/', 'projects/<slug>/'. */
+  path: string;
+  title?: string;
+  description: string;
+  ogImage?: ImageMetadata;
+  noindex?: boolean;
+}
+
+const { locale, path, title, description, ogImage, noindex = false } = Astro.props;
+const site = Astro.site ?? new URL('https://yaufdd.github.io');
+const fullTitle = title ? `${title} | ${t(locale, 'site.name')}` : `${t(locale, 'site.name')} — ${t(locale, 'site.role')}`;
+const canonical = new URL(localizePath(locale, path), site).href;
+const og = await getImage({ src: ogImage ?? defaultOgImage, width: 1200, height: 630, format: 'png' });
+const ogImageUrl = new URL(og.src, site).href;
+---
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={themeInitScript}></script>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {!noindex && LOCALES.map((l) => <link rel="alternate" hreflang={l} href={new URL(localizePath(l, path), site).href} />)}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={new URL(localizePath('ja', path), site).href} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content={locale === 'ja' ? 'ja_JP' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t(locale, 'a11y.skip')}</a>
+    <Nav locale={locale} path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

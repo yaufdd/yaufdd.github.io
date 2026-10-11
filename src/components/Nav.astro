@@ -1,0 +1,78 @@
+---
+import ThemeSwitcher from './ThemeSwitcher.astro';
+import type { Locale } from '../i18n/ui';
+import { localizePath, t } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+  /** Locale-neutral path of the current page; the language links point at its translations. */
+  path: string;
+}
+const { locale, path } = Astro.props;
+const links = [
+  { href: localizePath(locale, '#projects'), label: t(locale, 'nav.projects') },
+  { href: localizePath(locale, 'about/'), label: t(locale, 'nav.about') },
+  { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'nav.workflow') },
+];
+---
+<header class="site-header container mono">
+  <a class="logo" href={localizePath(locale, '')}>~/eric-bamba</a>
+  <nav aria-label={t(locale, 'a11y.mainNav')}>
+    <ul class="links">
+      {links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+    </ul>
+  </nav>
+  <div class="controls">
+    <div class="lang" role="group" aria-label={t(locale, 'nav.language')}>
+      <a href={localizePath('ja', path)} hreflang="ja" lang="ja" aria-current={locale === 'ja' ? 'true' : undefined}>ja</a>
+      <span aria-hidden="true">|</span>
+      <a href={localizePath('en', path)} hreflang="en" lang="en" aria-current={locale === 'en' ? 'true' : undefined}>en</a>
+    </div>
+    <ThemeSwitcher label={t(locale, 'nav.theme')} />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding-block: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .logo {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a,
+  .lang a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .links a:hover,
+  .lang a:hover,
+  .lang a[aria-current] {
+    color: var(--fg);
+  }
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .lang {
+    display: flex;
+    gap: 6px;
+  }
+</style>
