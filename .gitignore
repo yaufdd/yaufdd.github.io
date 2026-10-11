@@ -4,3 +4,6 @@ dist/
 .astro/
 .env
 .env.*
+test-results/
+playwright-report/
+forbidden.local.txt
