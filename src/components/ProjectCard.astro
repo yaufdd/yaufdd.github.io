@@ -1,0 +1,66 @@
+---
+import { Image } from 'astro:assets';
+import type { Locale } from '../i18n/ui';
+import { localizePath } from '../i18n/utils';
+import { slugOf, type Project } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+  entry: Project;
+}
+const { locale, entry } = Astro.props;
+const { data } = entry;
+const slug = slugOf(entry);
+---
+<a class="card" href={localizePath(locale, `projects/${slug}/`)}>
+  <Image src={data.cover} alt={data.coverAlt} widths={[480, 960]} sizes="(min-width: 960px) 440px, 100vw" class="cover" />
+  <span class="path mono">~/projects/{slug}</span>
+  <h3>{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h3>
+  <p class="desc">{data.summary}</p>
+  <ul class="tags">{data.stack.slice(0, 5).map((item) => <li>{item}</li>)}</ul>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .card:hover {
+    border-color: var(--accent);
+  }
+  .cover {
+    width: 100%;
+    height: auto;
+    margin-bottom: 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .path {
+    font-size: 12px;
+    color: var(--accent);
+  }
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  small {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .desc {
+    margin: 0 0 4px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+</style>
