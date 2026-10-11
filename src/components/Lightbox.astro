@@ -1,0 +1,95 @@
+---
+import type { Locale } from '../i18n/ui';
+import { t } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+<dialog class="lightbox" aria-label={t(locale, 'lightbox.label')}>
+  <button type="button" class="close" aria-label={t(locale, 'lightbox.close')}>×</button>
+  <img class="full" alt="" />
+</dialog>
+
+<script>
+  /** Markdown images carry a responsive srcset; the lightbox should show its largest candidate. */
+  function largestSource(img: HTMLImageElement): string {
+    const candidates = img.srcset
+      .split(',')
+      .map((candidate) => candidate.trim().split(/\s+/))
+      .filter(([url]) => url)
+      .map(([url = '', width = '0']) => ({ url, width: parseInt(width, 10) || 0 }))
+      .sort((a, b) => b.width - a.width);
+    return candidates[0]?.url || img.currentSrc || img.src;
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.lightbox');
+  const full = dialog?.querySelector<HTMLImageElement>('img.full');
+  const close = dialog?.querySelector<HTMLButtonElement>('button.close');
+
+  if (dialog && full && close) {
+    let opener: HTMLElement | null = null;
+    const open = (img: HTMLImageElement) => {
+      full.src = largestSource(img);
+      full.alt = img.alt;
+      opener = img;
+      dialog.showModal();
+    };
+
+    document.querySelectorAll<HTMLImageElement>('.prose img').forEach((img) => {
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.addEventListener('click', () => open(img));
+      img.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open(img);
+        }
+      });
+    });
+    close.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      opener?.focus();
+      opener = null;
+    });
+  }
+</script>
+
+<style>
+  .lightbox {
+    max-width: min(96vw, 1600px);
+    max-height: 92vh;
+    padding: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 0.75);
+  }
+  .full {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: calc(92vh - 2px);
+  }
+  .close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+</style>

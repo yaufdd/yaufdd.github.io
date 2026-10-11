@@ -50,3 +50,24 @@ test('project pages use the project cover as OG image', async ({ page }) => {
   await page.goto('/projects/pacxpuctanno/');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/_astro\/cover\..+\.png$/);
 });
+
+test('screenshots open in a lightbox and Escape returns focus', async ({ page }) => {
+  await page.goto('/projects/pacxpuctanno/');
+  const shot = page.locator('.prose img').first();
+  await shot.click();
+  const dialog = page.locator('dialog.lightbox');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('img.full')).toHaveAttribute('src', /\/_astro\/01-home\./);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(shot).toBeFocused();
+});
+
+test('the lightbox works from the keyboard', async ({ page }) => {
+  await page.goto('/en/projects/pacxpuctanno/');
+  await page.locator('.prose img').first().focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('dialog.lightbox')).toBeVisible();
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(page.locator('dialog.lightbox')).toBeHidden();
+});
