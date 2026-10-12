@@ -1,7 +1,7 @@
 ---
 title: Visa Document Automation
 summary: An internal system that reads passport and ticket scans with OCR and an LLM, then generates the full document set for a Japanese visa application.
-period: { start: "2026-04", end: null }
+period: { start: "2025-09", end: null }
 team: 1
 roles: [Requirements, Design, Backend, Frontend, Infra & CI/CD, Operations]
 stack: [Go, React, PostgreSQL, Python, YandexGPT, Yandex Vision OCR, Docker, GitHub Actions]

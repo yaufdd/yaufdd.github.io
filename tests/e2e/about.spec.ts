@@ -43,3 +43,28 @@ test('contacts show the email address on both languages', async ({ page }) => {
     await expect(page.locator('.contacts a[href="mailto:ercbamba@gmail.com"]')).toHaveText('ercbamba@gmail.com');
   }
 });
+
+test('about lists experience, education and languages', async ({ page }) => {
+  await page.goto('/about/');
+  const prose = page.locator('.prose').first();
+  for (const heading of ['自己紹介', '職歴', '学歴', '言語']) {
+    await expect(prose.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  }
+  await expect(prose).toContainText('FEAT MUSIC');
+  await expect(prose).toContainText('一越株式会社');
+  await expect(prose).toContainText('MIREA');
+  await expect(prose).toContainText('日本語 — ネイティブ');
+  await page.goto('/en/about/');
+  const en = page.locator('.prose').first();
+  for (const heading of ['About me', 'Experience', 'Education', 'Languages']) {
+    await expect(en.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  }
+  await expect(en).toContainText('Japanese — native');
+});
+
+test('the hero mentions native Japanese', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.hero [data-type]').nth(2)).toHaveText(/日本語ネイティブ/);
+  await page.goto('/en/');
+  await expect(page.locator('.hero [data-type]').nth(2)).toHaveText(/native Japanese/);
+});

@@ -7,7 +7,7 @@
   font-size: 18px;
 }
 .prose h2::before {
-  content: '## ';
+  content: '## ' / ''; /* decorative: hidden from the accessible name */
   color: var(--accent);
 }
 .prose h3 {

@@ -84,7 +84,7 @@ a {
   letter-spacing: 0.05em;
 }
 .section-title::before {
-  content: '## ';
+  content: '## ' / ''; /* decorative: hidden from the accessible name */
   color: var(--accent);
 }
 

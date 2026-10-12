@@ -26,7 +26,7 @@ for (const p of PAGES) {
 test('the overview shows period, team and roles', async ({ page }) => {
   await page.goto('/projects/visa-docs/');
   const meta = page.locator('.meta');
-  await expect(meta).toContainText('2026年4月 〜 現在');
+  await expect(meta).toContainText('2025年9月 〜 現在');
   await expect(meta).toContainText('1人（個人開発）');
   await expect(meta).toContainText('担当範囲');
   await expect(meta.locator('.tags li').first()).toHaveText('Go');

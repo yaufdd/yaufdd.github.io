@@ -1,7 +1,7 @@
 ---
 title: ビザ申請書類 自動生成システム
 summary: OCR と LLM でパスポートや航空券のスキャンを読み取り、日本のビザ申請書類一式を自動生成する社内システム。
-period: { start: "2026-04", end: null }
+period: { start: "2025-09", end: null }
 team: 1
 roles: [要件定義, 設計, バックエンド, フロントエンド, インフラ・CI/CD, 運用]
 stack: [Go, React, PostgreSQL, Python, YandexGPT, Yandex Vision OCR, Docker, GitHub Actions]
