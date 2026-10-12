@@ -20,7 +20,7 @@ for (const p of [
 }
 
 test('./workflow in the nav jumps to the workflow section', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/projects/visa-docs/');
   await page.getByRole('link', { name: './workflow' }).click();
   await expect(page).toHaveURL('/about/#workflow');
   await expect(page.locator('#workflow')).toBeInViewport();
@@ -62,9 +62,9 @@ test('about lists experience, education and languages', async ({ page }) => {
   await expect(en).toContainText('Japanese — native');
 });
 
-test('the hero mentions native Japanese', async ({ page }) => {
+test('the home page lists the languages I speak', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.hero [data-type]').nth(2)).toHaveText(/日本語ネイティブ/);
+  await expect(page.locator('.contacts')).toContainText('日本語・ロシア語（ネイティブ）');
   await page.goto('/en/');
-  await expect(page.locator('.hero [data-type]').nth(2)).toHaveText(/native Japanese/);
+  await expect(page.locator('.contacts')).toContainText('Japanese · Russian (native)');
 });

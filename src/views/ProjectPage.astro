@@ -19,7 +19,7 @@ const { Content } = await render(entry);
 ---
 <Base locale={locale} path={`projects/${slug}/`} title={data.title} description={data.summary} ogImage={data.cover}>
   <article class="container case">
-    <a class="back mono" href={localizePath(locale, '#projects')}>{t(locale, 'project.back')}</a>
+    <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>
     <p class="crumb">~/projects/{slug}</p>
     <h1 class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
     <p class="lead">{data.summary}</p>

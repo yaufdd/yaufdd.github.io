@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const avatar = '.hero [data-avatar]';
+const avatar = '[data-avatar]';
 
 test('the 3D avatar loads, renders and reacts to a click', async ({ page }) => {
   const errors: string[] = [];

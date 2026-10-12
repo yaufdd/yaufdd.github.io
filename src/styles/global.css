@@ -10,7 +10,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: radial-gradient(120% 120% at 30% 20%, #f6f6f6 0%, var(--bg) 55%, #dcdcdc 100%) fixed var(--bg);
   color: var(--fg);
   font-family: 'Noto Sans JP', system-ui, sans-serif;
   font-size: 16px;
@@ -119,11 +119,6 @@ a {
   line-height: 1.6;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  body {
-    transition: background-color 0.2s, color 0.2s;
-  }
-}
 
 .sr-only {
   position: absolute;

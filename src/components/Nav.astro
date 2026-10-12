@@ -1,5 +1,4 @@
 ---
-import ThemeSwitcher from './ThemeSwitcher.astro';
 import type { Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
 
@@ -7,28 +6,30 @@ interface Props {
   locale: Locale;
   /** Locale-neutral path of the current page; the language links point at its translations. */
   path: string;
+  /** Home page: only the language switch, like the reference design. */
+  bare?: boolean;
 }
-const { locale, path } = Astro.props;
+const { locale, path, bare = false } = Astro.props;
 const links = [
-  { href: localizePath(locale, '#projects'), label: t(locale, 'nav.projects') },
   { href: localizePath(locale, 'about/'), label: t(locale, 'nav.about') },
   { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'nav.workflow') },
 ];
 ---
-<header class="site-header container mono">
-  <a class="logo" href={localizePath(locale, '')}>~/eric-bamba</a>
-  <nav aria-label={t(locale, 'a11y.mainNav')}>
-    <ul class="links">
-      {links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
-    </ul>
-  </nav>
-  <div class="controls">
-    <div class="lang" role="group" aria-label={t(locale, 'nav.language')}>
-      <a href={localizePath('ja', path)} hreflang="ja" lang="ja" aria-current={locale === 'ja' ? 'true' : undefined}>ja</a>
-      <span aria-hidden="true">|</span>
-      <a href={localizePath('en', path)} hreflang="en" lang="en" aria-current={locale === 'en' ? 'true' : undefined}>en</a>
-    </div>
-    <ThemeSwitcher label={t(locale, 'nav.theme')} />
+<header class:list={['site-header', 'container', { bare }]}>
+  {!bare && <a class="logo" href={localizePath(locale, '')}>{t(locale, 'site.name')}</a>}
+  {
+    !bare && (
+      <nav aria-label={t(locale, 'a11y.mainNav')}>
+        <ul class="links">
+          {links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </nav>
+    )
+  }
+  <div class="lang" role="group" aria-label={t(locale, 'nav.language')}>
+    <a href={localizePath('ja', path)} hreflang="ja" lang="ja" aria-current={locale === 'ja' ? 'true' : undefined}>JA</a>
+    <span aria-hidden="true">|</span>
+    <a href={localizePath('en', path)} hreflang="en" lang="en" aria-current={locale === 'en' ? 'true' : undefined}>EN</a>
   </div>
 </header>
 
@@ -41,11 +42,22 @@ const links = [
     gap: 12px 24px;
     padding-block: 20px;
     font-size: 13px;
+    font-weight: 700;
     color: var(--muted);
   }
+  .site-header.bare {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 5;
+    justify-content: flex-end;
+    max-width: none;
+    width: auto;
+  }
   .logo {
-    color: var(--accent);
-    font-weight: 600;
+    color: var(--fg);
+    font-size: 15px;
+    font-weight: 900;
     text-decoration: none;
   }
   .links {
@@ -60,16 +72,12 @@ const links = [
   .lang a {
     color: var(--muted);
     text-decoration: none;
+    letter-spacing: 0.05em;
   }
   .links a:hover,
   .lang a:hover,
   .lang a[aria-current] {
     color: var(--fg);
-  }
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 16px;
   }
   .lang {
     display: flex;

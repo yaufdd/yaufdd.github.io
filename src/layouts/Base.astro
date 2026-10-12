@@ -9,7 +9,6 @@ import defaultOgImage from '../assets/og-default.png';
 import { LOCALES, type Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
 import { motionInitScript } from '../lib/motion';
-import { themeInitScript } from '../lib/theme';
 
 interface Props {
   locale: Locale;
@@ -19,9 +18,11 @@ interface Props {
   description: string;
   ogImage?: ImageMetadata;
   noindex?: boolean;
+  /** Home page: no navigation bar or footer, only the language switch (reference design). */
+  bare?: boolean;
 }
 
-const { locale, path, title, description, ogImage, noindex = false } = Astro.props;
+const { locale, path, title, description, ogImage, noindex = false, bare = false } = Astro.props;
 const site = Astro.site ?? new URL('https://yaufdd.github.io');
 const fullTitle = title ? `${title} | ${t(locale, 'site.name')}` : `${t(locale, 'site.name')} — ${t(locale, 'site.role')}`;
 const canonical = new URL(localizePath(locale, path), site).href;
@@ -33,7 +34,7 @@ const ogImageUrl = new URL(og.src, site).href;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline set:html={themeInitScript + motionInitScript}></script>
+    <script is:inline set:html={motionInitScript}></script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
@@ -50,14 +51,14 @@ const ogImageUrl = new URL(og.src, site).href;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" />
   </head>
   <body>
     <a class="skip-link" href="#main">{t(locale, 'a11y.skip')}</a>
-    <Nav locale={locale} path={path} />
+    <Nav locale={locale} path={path} bare={bare} />
     <main id="main">
       <slot />
     </main>
-    <Footer locale={locale} />
+    {!bare && <Footer locale={locale} />}
   </body>
 </html>

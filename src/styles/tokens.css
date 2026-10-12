@@ -1,37 +1,12 @@
-/* Theme tokens. dim is the default and also applies without JavaScript (no data-theme attribute). */
-:root,
-:root[data-theme='dim'] {
-  color-scheme: dark;
-  --bg: #22272e;
-  --card: #2d333b;
-  --fg: #cdd9e5;
-  --muted: #909dab;
-  --border: #444c56;
-  --accent: #6bc46d;
-  --tag-bg: #30363f;
-  --tag-fg: #96d0ff;
-}
-
-:root[data-theme='light'] {
+/* One white, monochrome palette (owner's reference design). */
+:root {
   color-scheme: light;
-  --bg: #ffffff;
-  --card: #f6f8fa;
-  --fg: #1f2328;
-  --muted: #59636e;
-  --border: #d1d9e0;
-  --accent: #1a7f37;
-  --tag-bg: #ddf4ff;
-  --tag-fg: #0550ae;
-}
-
-:root[data-theme='paper'] {
-  color-scheme: light;
-  --bg: #faf8f3;
-  --card: #f2eee5;
-  --fg: #26231f;
-  --muted: #6b655b;
-  --border: #ddd6c8;
-  --accent: #b83a2a;
-  --tag-bg: #eae4d7;
-  --tag-fg: #4a4438;
+  --bg: #ececec;
+  --card: #ffffff;
+  --fg: #1f1f1f;
+  --muted: #555555;
+  --border: #d4d4d4;
+  --accent: #1f1f1f;
+  --tag-bg: #2e2e2e;
+  --tag-fg: #ffffff;
 }
