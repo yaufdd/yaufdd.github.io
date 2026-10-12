@@ -64,14 +64,12 @@ for (const size of [
     expect(Math.abs(projects!.y - education!.y)).toBeLessThanOrEqual(2);
   });
 
-  test(`the contacts sit together, centred under the columns, at ${size.width}×${size.height}`, async ({ page }) => {
+  test(`the contacts sit together, starting at the left edge under the 2D card's column, at ${size.width}×${size.height}`, async ({ page }) => {
     await page.setViewportSize(size);
     await page.goto('/');
-    const [photo, experience, education] = await Promise.all(['.photo', '.experience', '.education'].map(async (s) => (await page.locator(s).boundingBox())!));
+    const [photo, education] = await Promise.all(['.photo', '.education'].map(async (s) => (await page.locator(s).boundingBox())!));
     const items = await Promise.all((await page.locator('.contacts li').all()).map(async (li) => (await li.boundingBox())!));
-    const left = items[0]!.x;
-    const right = items.at(-1)!.x + items.at(-1)!.width;
-    expect(Math.abs((left + right) / 2 - (photo!.x + experience!.x + experience!.width) / 2)).toBeLessThanOrEqual(4);
+    expect(Math.abs(items[0]!.x - photo!.x)).toBeLessThanOrEqual(2);
     for (let i = 1; i < items.length; i++) expect(items[i]!.x - (items[i - 1]!.x + items[i - 1]!.width)).toBeLessThanOrEqual(48);
     expect(items[0]!.y).toBeGreaterThanOrEqual(education!.y + education!.height);
   });
