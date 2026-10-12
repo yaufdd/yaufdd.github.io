@@ -9,9 +9,7 @@ import Base from '../layouts/Base.astro';
     <p class="muted" lang="en">{t('en', 'notFound.title')}</p>
     <p>{t('ja', 'notFound.text')}</p>
     <p class="mono">
-      <a href={localizePath('ja', '')}>{t('ja', 'notFound.home')}</a>
-      ·
-      <a href={localizePath('en', '')} lang="en">{t('en', 'notFound.home')}</a>
+      <a href={localizePath('ja', '')}>{t('ja', 'notFound.home')}</a>{' · '}<a href={localizePath('en', '')} lang="en">{t('en', 'notFound.home')}</a>
     </p>
   </section>
 </Base>

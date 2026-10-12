@@ -9,6 +9,7 @@ status: active
 devProcess: Claude Code で「仕様 → 実装計画 → TDD → レビュー」のサイクルを回して開発。
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — ターミナル風のカバー画像"
+screen: ["$ visa-docs generate --group demo", "scan → ocr → llm → docgen", "✓ passport.pdf parsed", "✓ 6 documents generated"]
 order: 1
 ---
 

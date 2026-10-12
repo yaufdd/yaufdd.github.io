@@ -34,4 +34,5 @@ test('unknown URLs get a noindex 404 page whose links work', async ({ page }) =>
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
   await expect(page.locator('.lang a[hreflang="ja"]')).toHaveAttribute('href', '/');
   await expect(page.locator('.lang a[hreflang="en"]')).toHaveAttribute('href', '/en/');
+  await expect(page.locator('.notfound p.mono')).toHaveText('トップへ戻る · Back to top');
 });

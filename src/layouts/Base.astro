@@ -8,6 +8,7 @@ import Nav from '../components/Nav.astro';
 import defaultOgImage from '../assets/og-default.png';
 import { LOCALES, type Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
+import { motionInitScript } from '../lib/motion';
 import { themeInitScript } from '../lib/theme';
 
 interface Props {
@@ -32,7 +33,7 @@ const ogImageUrl = new URL(og.src, site).href;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline set:html={themeInitScript}></script>
+    <script is:inline set:html={themeInitScript + motionInitScript}></script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}

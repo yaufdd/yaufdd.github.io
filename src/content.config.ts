@@ -20,6 +20,8 @@ const projects = defineCollection({
       links: z.object({ live: z.url().optional(), repo: z.url().optional() }).default({}),
       cover: image(),
       coverAlt: z.string().min(1),
+      /** Lines of the animated terminal on the home page card; without them the card shows the cover image. */
+      screen: z.array(z.string().min(1)).min(1).max(6).optional(),
       order: z.number().int(),
       draft: z.boolean().default(false),
     }),

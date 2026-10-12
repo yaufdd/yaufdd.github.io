@@ -1,26 +1,44 @@
 ---
 import { Image } from 'astro:assets';
 import type { Locale } from '../i18n/ui';
-import { localizePath } from '../i18n/utils';
+import { localizePath, t } from '../i18n/utils';
 import { slugOf, type Project } from '../lib/content';
+import { screenLineKind } from '../lib/motion';
 
 interface Props {
   locale: Locale;
   entry: Project;
+  /** Position in the grid, used to stagger the entrance animation. */
+  index?: number;
 }
-const { locale, entry } = Astro.props;
+const { locale, entry, index = 0 } = Astro.props;
 const { data } = entry;
 const slug = slugOf(entry);
 ---
-<a class="card" href={localizePath(locale, `projects/${slug}/`)}>
-  <Image src={data.cover} alt={data.coverAlt} widths={[480, 960]} sizes="(min-width: 960px) 440px, 100vw" class="cover" />
-  <span class="path mono">~/projects/{slug}</span>
-  <h3>{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h3>
-  <p class="desc">{data.summary}</p>
-  <ul class="tags">{data.stack.slice(0, 5).map((item) => <li>{item}</li>)}</ul>
-</a>
+{/* The reveal animation sits on a wrapper so its transform never fights the card hover lift. */}
+<div class="reveal" data-reveal style={`--i: ${index}`}>
+  <a class="card" href={localizePath(locale, `projects/${slug}/`)}>
+    {
+      data.screen ? (
+        <div class="screen mono" data-screen aria-hidden="true">
+          {data.screen.map((line) => <div class={screenLineKind(line)}>{line}</div>)}
+        </div>
+      ) : (
+        <Image src={data.cover} alt={data.coverAlt} widths={[480, 960]} sizes="(min-width: 960px) 440px, 100vw" class="cover" />
+      )
+    }
+    <span class="path mono">~/projects/{slug}</span>
+    <h3>{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h3>
+    <p class="desc">{data.summary}</p>
+    <ul class="tags">{data.stack.slice(0, 5).map((item) => <li>{item}</li>)}</ul>
+    <span class="more mono">{t(locale, 'project.more')}</span>
+  </a>
+</div>
 
 <style>
+  .reveal {
+    display: grid;
+  }
   .card {
     display: flex;
     flex-direction: column;
@@ -31,9 +49,39 @@ const slug = slugOf(entry);
     border-radius: 8px;
     color: var(--fg);
     text-decoration: none;
+    transition:
+      translate 0.2s,
+      border-color 0.2s,
+      box-shadow 0.2s;
   }
   .card:hover {
+    translate: 0 -4px;
     border-color: var(--accent);
+    box-shadow:
+      0 10px 28px rgb(0 0 0 / 0.3),
+      0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .screen {
+    margin-bottom: 6px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+  }
+  .screen > div {
+    min-height: 1.75em;
+  }
+  .screen .cmd {
+    color: var(--fg);
+  }
+  .screen .ok {
+    color: var(--accent);
+  }
+  .screen .out {
+    color: var(--muted);
   }
   .cover {
     width: 100%;
@@ -62,5 +110,13 @@ const slug = slugOf(entry);
     font-size: 14px;
     line-height: 1.7;
     color: var(--muted);
+  }
+  .more {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .card:hover .more {
+    text-decoration: underline;
   }
 </style>

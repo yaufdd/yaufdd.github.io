@@ -124,3 +124,63 @@ a {
     transition: background-color 0.2s, color 0.2s;
   }
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Entrance animations (src/lib/motion.ts). Start states apply only under html.motion — JavaScript on and no
+ * prefers-reduced-motion — so without JS or with reduced motion everything is simply visible.
+ * Until the script reports html.motion-ready, a timed fallback reveals everything, so a failed script never
+ * leaves content hidden.
+ */
+.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.motion [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+.motion:not(.motion-ready) :is([data-reveal], [data-type], [data-screen] > *) {
+  opacity: 0;
+  animation: motion-fallback 0s 3s forwards;
+}
+@keyframes motion-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cursor {
+    animation: cursor-blink 1s steps(1) infinite;
+  }
+}
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
