@@ -36,12 +36,12 @@ test('"What I do" lists three things in both languages', async ({ page }) => {
   await expect(page.locator('#what li')).toHaveCount(3);
 });
 
-test('project cards type out their terminal screen and invite a click', async ({ page }) => {
+test('project cards are calm text cards that invite a click', async ({ page }) => {
   await page.goto('/');
-  const card = page.locator('#projects .card').first();
-  await card.scrollIntoViewIfNeeded();
-  await expect(card.locator('.screen')).toContainText('✓ 6 documents generated');
-  await expect(card).toContainText('詳しく見る →');
+  const cards = page.locator('#projects .card');
+  await expect(cards.first()).toContainText('詳しく見る →');
+  await expect(cards.locator('.screen')).toHaveCount(0);
+  await expect(cards.locator('img')).toHaveCount(0);
 });
 
 test('sections below the fold appear when scrolled to', async ({ page }) => {
@@ -66,7 +66,7 @@ test.describe('without JavaScript', () => {
   test('everything is visible and complete', async ({ page }) => {
     await page.goto('/');
     expect(new Set(await opacityOf(page, '[data-reveal], [data-type]'))).toEqual(new Set(['1']));
-    await expect(page.locator('#projects .card .screen').first()).toContainText('✓ 6 documents generated');
+    await expect(page.locator('#projects .card').first()).toContainText('詳しく見る →');
   });
 });
 

@@ -1,9 +1,7 @@
 ---
-import { Image } from 'astro:assets';
 import type { Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
 import { slugOf, type Project } from '../lib/content';
-import { screenLineKind } from '../lib/motion';
 
 interface Props {
   locale: Locale;
@@ -18,15 +16,6 @@ const slug = slugOf(entry);
 {/* The reveal animation sits on a wrapper so its transform never fights the card hover lift. */}
 <div class="reveal" data-reveal style={`--i: ${index}`}>
   <a class="card" href={localizePath(locale, `projects/${slug}/`)}>
-    {
-      data.screen ? (
-        <div class="screen mono" data-screen aria-hidden="true">
-          {data.screen.map((line) => <div class={screenLineKind(line)}>{line}</div>)}
-        </div>
-      ) : (
-        <Image src={data.cover} alt={data.coverAlt} widths={[480, 960]} sizes="(min-width: 960px) 440px, 100vw" class="cover" />
-      )
-    }
     <span class="path mono">~/projects/{slug}</span>
     <h3>{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h3>
     <p class="desc">{data.summary}</p>
@@ -43,7 +32,7 @@ const slug = slugOf(entry);
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 16px;
+    padding: 20px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -60,35 +49,6 @@ const slug = slugOf(entry);
     box-shadow:
       0 10px 28px rgb(0 0 0 / 0.3),
       0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
-  }
-  .screen {
-    margin-bottom: 6px;
-    padding: 12px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 12px;
-    line-height: 1.75;
-    white-space: pre-wrap;
-  }
-  .screen > div {
-    min-height: 1.75em;
-  }
-  .screen .cmd {
-    color: var(--fg);
-  }
-  .screen .ok {
-    color: var(--accent);
-  }
-  .screen .out {
-    color: var(--muted);
-  }
-  .cover {
-    width: 100%;
-    height: auto;
-    margin-bottom: 6px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
   }
   .path {
     font-size: 12px;
@@ -112,7 +72,8 @@ const slug = slugOf(entry);
     color: var(--muted);
   }
   .more {
-    margin-top: 4px;
+    margin-top: auto;
+    padding-top: 4px;
     font-size: 12px;
     color: var(--accent);
   }

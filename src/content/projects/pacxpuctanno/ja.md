@@ -11,7 +11,6 @@ links: { live: "https://pacxpuctanno.shop" }
 devProcess: Claude Code で仕様書と実装計画を書いてから実装（spec / plan をリポジトリで管理）。
 cover: ./images/cover.png
 coverAlt: "~/projects/pacxpuctanno — ターミナル風のカバー画像"
-screen: ["$ curl pacxpuctanno.shop/api/v1/catalog/drops/active", "✓ 200 OK", "✓ designer: ready"]
 order: 2
 ---
 

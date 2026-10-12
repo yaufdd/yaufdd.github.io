@@ -9,7 +9,6 @@ status: active
 devProcess: Built with Claude Code in a spec → plan → TDD → review loop.
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — terminal-style cover image"
-screen: ["$ visa-docs generate --group demo", "scan → ocr → llm → docgen", "✓ passport.pdf parsed", "✓ 6 documents generated"]
 order: 1
 ---
 

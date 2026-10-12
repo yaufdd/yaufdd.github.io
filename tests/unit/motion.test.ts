@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MOTION_CLASS, motionInitScript, screenLineKind } from '../../src/lib/motion';
+import { MOTION_CLASS, motionInitScript } from '../../src/lib/motion';
 
 /** Runs the inline <head> script against fake globals and returns the classes it put on <html>. */
 function runInitScript(reducedMotion: boolean | 'throws'): Set<string> {
@@ -28,13 +28,3 @@ describe('motionInitScript', () => {
   });
 });
 
-describe('screenLineKind', () => {
-  it.each([
-    ['$ visa-docs generate', 'cmd'],
-    ['✓ 200 OK', 'ok'],
-    ['scan → ocr → llm', 'out'],
-    ['', 'out'],
-  ] as const)('%j is %s', (line, kind) => {
-    expect(screenLineKind(line)).toBe(kind);
-  });
-});

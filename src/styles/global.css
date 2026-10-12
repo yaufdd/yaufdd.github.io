@@ -155,7 +155,7 @@ a {
   opacity: 1;
   transform: none;
 }
-.motion:not(.motion-ready) :is([data-reveal], [data-type], [data-screen] > *) {
+.motion:not(.motion-ready) :is([data-reveal], [data-type]) {
   opacity: 0;
   animation: motion-fallback 0s 3s forwards;
 }

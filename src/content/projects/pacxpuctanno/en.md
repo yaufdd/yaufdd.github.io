@@ -11,7 +11,6 @@ links: { live: "https://pacxpuctanno.shop" }
 devProcess: Spec and implementation plan written with Claude Code before coding (kept in the repository).
 cover: ./images/cover.png
 coverAlt: "~/projects/pacxpuctanno — terminal-style cover image"
-screen: ["$ curl pacxpuctanno.shop/api/v1/catalog/drops/active", "✓ 200 OK", "✓ designer: ready"]
 order: 2
 ---
 
