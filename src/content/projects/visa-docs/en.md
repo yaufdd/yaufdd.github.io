@@ -1,6 +1,7 @@
 ---
 title: Visa Document Automation
 summary: An internal system that reads passport and ticket scans with OCR and an LLM, then generates the full document set for a Japanese visa application.
+tagline: Visa paperwork, generated with OCR and an LLM
 period: { start: "2025-09", end: null }
 team: 1
 roles: [Requirements, Design, Backend, Frontend, Infra & CI/CD, Operations]

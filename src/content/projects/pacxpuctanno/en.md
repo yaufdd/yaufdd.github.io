@@ -2,6 +2,7 @@
 title: pacxpuctanno
 subtitle: РАСХРИСТАННО
 summary: The official site of my own clothing brand — catalog, lookbook, a T-shirt designer and a custom admin panel, built and run solo.
+tagline: The website of my own clothing brand
 period: { start: "2026-03", end: "2026-04" }
 team: 1
 roles: [Planning, Design, Backend, Frontend, Infra & CI/CD, Operations]

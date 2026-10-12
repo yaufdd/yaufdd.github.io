@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
 import photo from '../assets/avatar-2d.jpg';
-import head from '../assets/avatar-head.png';
 import Avatar3D from '../components/Avatar3D.astro';
 import { contacts, education, experience } from '../data/profile';
 import { skills } from '../data/skills';
@@ -16,8 +15,8 @@ interface Props {
 const { locale } = Astro.props;
 const projects = await getProjects(locale);
 const links = [
-  ...projects.map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title })),
-  { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'home.workflowLink') },
+  ...projects.map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title, tagline: p.data.tagline })),
+  { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'home.workflowLink'), tagline: t(locale, 'home.workflowTagline') },
 ];
 ---
 <Base locale={locale} path="" description={t(locale, 'home.bio')} bare>
@@ -27,15 +26,28 @@ const links = [
     </figure>
 
     <section class="hello" data-reveal style="--i: 1" aria-labelledby="hello-title">
-      <h1 id="hello-title">{t(locale, 'home.hello')}<Image src={head} alt="" width={120} height={120} class="head" loading="eager" /></h1>
+      <h1 id="hello-title">{t(locale, 'home.hello')}</h1>
       <p class="bio">{t(locale, 'home.bio')}</p>
       <p class="enjoy">{t(locale, 'home.enjoy')}</p>
-      <ul class="links">
-        {links.map((link) => <li><a href={link.href}>{link.label} →</a></li>)}
+    </section>
+
+    <section class="projects" data-reveal style="--i: 2" aria-labelledby="projects-title">
+      <h2 id="projects-title">{t(locale, 'home.projects')}</h2>
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href}>
+                <b>{link.label} →</b>
+                <span>{link.tagline}</span>
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </section>
 
-    <section class="skills" data-reveal style="--i: 2" aria-labelledby="skills-title">
+    <section class="skills" data-reveal style="--i: 3" aria-labelledby="skills-title">
       <h2 id="skills-title">{t(locale, 'home.skills')}</h2>
       <ul>
         {
@@ -54,7 +66,7 @@ const links = [
       </ul>
     </section>
 
-    <section class="experience" data-reveal style="--i: 3" aria-labelledby="experience-title">
+    <section class="experience" data-reveal style="--i: 4" aria-labelledby="experience-title">
       <h2 id="experience-title">{t(locale, 'home.experience')}</h2>
       <ol>
         {
@@ -68,13 +80,13 @@ const links = [
       </ol>
     </section>
 
-    <section class="education" data-reveal style="--i: 4" aria-labelledby="education-title">
+    <section class="education" data-reveal style="--i: 5" aria-labelledby="education-title">
       <h2 id="education-title">{t(locale, 'home.education')}</h2>
       <p class="degree">{education.degree[locale]}</p>
       <p>{education.note[locale]}</p>
     </section>
 
-    <ul class="contacts" data-reveal style="--i: 5" aria-label={t(locale, 'home.contacts')}>
+    <ul class="contacts" data-reveal style="--i: 6" aria-label={t(locale, 'home.contacts')}>
       <li>
         <a href={`mailto:${contacts.email}`}>
           <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg></i>{contacts.email}
@@ -142,9 +154,9 @@ const links = [
     line-height: 1;
     letter-spacing: -0.01em;
   }
-  .head {
-    width: auto;
-    height: 1.1em;
+  /* Japanese greeting is six full-width characters: smaller so it stays on one line. */
+  h1:lang(ja) {
+    font-size: clamp(40px, 12vw, 64px);
   }
   h2 {
     margin: 0 0 14px;
@@ -158,28 +170,37 @@ const links = [
     line-height: 1.65;
   }
   .enjoy {
-    margin: 20px 0 8px;
+    margin-top: 20px;
     font-size: 14px;
   }
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
+  .projects ul {
+    display: grid;
+    gap: 14px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .links a {
-    padding-bottom: 1px;
-    border-bottom: 2px solid var(--fg);
+  .projects a {
+    display: grid;
+    gap: 4px;
     color: var(--fg);
-    font-size: 13px;
-    font-weight: 700;
     text-decoration: none;
     transition: opacity 0.15s;
   }
-  .links a:hover {
+  .projects a:hover {
     opacity: 0.6;
+  }
+  .projects b {
+    justify-self: start;
+    padding-bottom: 1px;
+    border-bottom: 2px solid var(--fg);
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .projects span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
   }
   .degree {
     margin-bottom: 14px;
@@ -275,22 +296,28 @@ const links = [
       grid-template-rows: auto minmax(0, 1fr) auto;
       grid-template-areas:
         'photo hello skills'
-        'photo edu exp'
-        'photo contacts contacts';
+        'projects edu exp'
+        'projects contacts contacts';
       gap: 0 40px;
       max-width: 1240px;
       height: 100dvh;
       padding: 44px 0 40px 44px;
       overflow: hidden;
     }
+    /* Square, exactly the picture, its top level with the greeting; the projects take the space under it. */
     .photo {
       grid-area: photo;
-      aspect-ratio: auto;
-      height: 100%;
+      align-self: start;
+      margin-top: 40px;
     }
     .hello {
       grid-area: hello;
       padding-top: 40px;
+    }
+    .projects {
+      grid-area: projects;
+      align-self: start;
+      margin-top: 28px;
     }
     .education {
       grid-area: edu;
@@ -322,6 +349,9 @@ const links = [
     }
     h1 {
       font-size: clamp(48px, min(10vh, 6vw), 84px);
+    }
+    h1:lang(ja) {
+      font-size: clamp(40px, min(8vh, 4.5vw), 64px);
     }
     .education,
     .experience {

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Renders the 3D avatar's still images with the live viewer's own camera and studio light (src/lib/avatar-stage.ts):
+// Renders the 3D avatar's still image with the live viewer's own camera and studio light (src/lib/avatar-stage.ts):
 //   src/assets/avatar-poster.png — the whole figure, shown until the 3D view is ready (and without JS or WebGL)
-//   src/assets/avatar-head.png   — the head next to "Hello!"
 // Re-run after changing the model, the camera or the light: node scripts/render-avatar-stills.mjs
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -15,8 +14,6 @@ const three = join(root, 'node_modules/three');
 const shots = [
   // Same framing as the live viewer (createCamera), at the poster's size.
   { name: 'poster', out: 'src/assets/avatar-poster.png', width: 437, height: 728 },
-  // A closer camera on the head; the light stays exactly the same.
-  { name: 'head', out: 'src/assets/avatar-head.png', width: 240, height: 240, head: { y: 0.78, height: 0.56 } },
 ];
 
 const page = `<!doctype html>
@@ -30,7 +27,7 @@ const page = `<!doctype html>
   import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
   import { addStudioLight, createCamera, tuneRenderer } from '/stage.js';
 
-  window.render = async ({ width, height, head }) => {
+  window.render = async ({ width, height }) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setPixelRatio(2); // supersampled: the screenshot is taken at 1x
     renderer.setSize(width, height);
@@ -43,13 +40,7 @@ const page = `<!doctype html>
     scene.add(figure);
     addStudioLight(THREE, scene, figure, new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture);
 
-    let camera = createCamera(THREE, width / height);
-    if (head) {
-      camera = new THREE.PerspectiveCamera(26, width / height, 0.1, 20);
-      camera.position.set(0, head.y, head.height / (2 * Math.tan(THREE.MathUtils.degToRad(13))));
-      camera.lookAt(0, head.y, 0);
-    }
-    renderer.render(scene, camera);
+    renderer.render(scene, createCamera(THREE, width / height));
   };
 </script>`;
 

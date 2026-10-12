@@ -11,6 +11,8 @@ const projects = defineCollection({
       title: z.string().min(1),
       subtitle: z.string().min(1).optional(),
       summary: z.string().min(1),
+      /** One short line under the project's link on the home page. */
+      tagline: z.string().min(1),
       period: z.object({ start: yearMonth, end: yearMonth.nullable() }),
       team: z.number().int().positive(),
       roles: z.array(z.string().min(1)).min(1),

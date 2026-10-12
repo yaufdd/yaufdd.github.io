@@ -30,10 +30,10 @@ npm run test:e2e                   # build + browser tests
 
 ## 3D avatar
 
-`public/models/avatar.glb` is shown live on the home page. Its camera and studio light live in `src/lib/avatar-stage.ts`; after changing the model, the camera or the light, re-render the still poster and the head icon with the same setup (an e2e test fails if the poster no longer looks like the live figure):
+`public/models/avatar.glb` is shown live on the home page. Its camera and studio light live in `src/lib/avatar-stage.ts`; after changing the model, the camera or the light, re-render the still poster with the same setup (an e2e test fails if the poster no longer looks like the live figure):
 
 ```bash
-npm run stills   # → src/assets/avatar-poster.png, src/assets/avatar-head.png
+npm run stills   # → src/assets/avatar-poster.png
 ```
 
 ## Content checks

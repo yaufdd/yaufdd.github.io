@@ -23,6 +23,11 @@ function expectedProjectLinks(locale: 'ja' | 'en'): string[] {
     .map((p) => `${prefix}projects/${p.slug}/`);
 }
 
+const HEADINGS = {
+  ja: { hello: 'こんにちは！', projects: 'プロジェクト', skills: 'スキル', experience: '職歴', education: '学歴' },
+  en: { hello: 'Hello!', projects: 'Projects', skills: 'Skills', experience: 'Experience', education: 'Education' },
+} as const;
+
 for (const size of [
   { width: 1280, height: 800 },
   { width: 1440, height: 900 },
@@ -32,7 +37,7 @@ for (const size of [
     await page.goto('/');
     const overflow = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
     expect(overflow).toBeLessThanOrEqual(1);
-    const blocks = ['.photo', '.hello', '.skills', '.experience', '.education', '.contacts', '[data-avatar]'];
+    const blocks = ['.photo', '.hello', '.projects', '.skills', '.experience', '.education', '.contacts', '[data-avatar]'];
     for (const selector of blocks) {
       await expect(page.locator(selector)).toBeInViewport({ ratio: 1 });
     }
@@ -44,7 +49,29 @@ for (const size of [
     expect(overlaps).toEqual([]);
   });
 
-  test(`Hello! stays on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
+  test(`the square 2D card starts level with the greeting and the projects sit under it at ${size.width}×${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto('/');
+    const [photo, greeting, projects] = await Promise.all(['.photo', '.hello h1', '.projects'].map(async (s) => (await page.locator(s).boundingBox())!));
+    expect(photo!.width / photo!.height).toBeCloseTo(1, 1);
+    expect(Math.abs(photo!.y - greeting!.y)).toBeLessThanOrEqual(8);
+    expect(projects!.y).toBeGreaterThanOrEqual(photo!.y + photo!.height);
+    expect(Math.abs(projects!.x - photo!.x)).toBeLessThanOrEqual(2);
+  });
+
+  test(`each project's description fits on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
+    await page.setViewportSize(size);
+    for (const url of ['/', '/en/']) {
+      await page.goto(url);
+      const lines = await page.locator('.projects a span').evaluateAll((els) =>
+        els.map((e) => e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)),
+      );
+      expect(lines.length).toBeGreaterThan(0);
+      for (const n of lines) expect(n, url).toBeLessThan(1.5);
+    }
+  });
+
+  test(`the greeting stays on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
     await page.setViewportSize(size);
     for (const url of ['/', '/en/']) {
       await page.goto(url);
@@ -57,21 +84,39 @@ for (const size of [
 for (const locale of ['ja', 'en'] as const) {
   const home = locale === 'ja' ? '/' : '/en/';
 
-  test(`${locale}: hello introduces me and links to every project and the workflow`, async ({ page }) => {
+  test(`${locale}: every heading is in the page's language`, async ({ page }) => {
     await page.goto(home);
-    await expect(page.locator('.hello h1')).toHaveText('Hello!');
+    const h = HEADINGS[locale];
+    await expect(page.locator('.hello h1')).toHaveText(h.hello);
+    await expect(page.locator('.projects h2')).toHaveText(h.projects);
+    await expect(page.locator('.skills h2')).toHaveText(h.skills);
+    await expect(page.locator('.experience h2')).toHaveText(h.experience);
+    await expect(page.locator('.education h2')).toHaveText(h.education);
+  });
+
+  test(`${locale}: the greeting introduces me, without the small head picture`, async ({ page }) => {
+    await page.goto(home);
     await expect(page.locator('.hello .bio')).toContainText(locale === 'ja' ? '番場エリク' : 'Eric Bamba');
+    await expect(page.locator('.hello img')).toHaveCount(0);
+  });
+
+  test(`${locale}: the projects section links to every project and the workflow, each with a description`, async ({ page }) => {
+    await page.goto(home);
     const expected = expectedProjectLinks(locale);
     expect(expected.length).toBeGreaterThan(0);
-    const links = await page.locator('.hello .links a').evaluateAll((els) => els.map((e) => e.getAttribute('href')));
-    expect(links).toEqual([...expected, locale === 'ja' ? '/about/#workflow' : '/en/about/#workflow']);
-    await page.locator('.hello .links a').first().click();
+    const links = page.locator('.projects a');
+    expect(await links.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual([
+      ...expected,
+      locale === 'ja' ? '/about/#workflow' : '/en/about/#workflow',
+    ]);
+    for (const text of await page.locator('.projects a span').allTextContents()) expect(text.trim()).not.toBe('');
+    await expect(page.locator('.projects a span')).toHaveCount(expected.length + 1);
+    await links.first().click();
     await expect(page).toHaveURL(expected[0]!);
   });
 
   test(`${locale}: skills, experience, education and contacts`, async ({ page }) => {
     await page.goto(home);
-    await expect(page.locator('.skills h2')).toHaveText('Skills');
     expect(await page.locator('.skills li').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))).toEqual([
       'Go',
       'React',
@@ -80,10 +125,8 @@ for (const locale of ['ja', 'en'] as const) {
       'Docker',
       'AWS',
     ]);
-    await expect(page.locator('.experience h2')).toHaveText('Experience');
     await expect(page.locator('.experience li')).toHaveCount(3);
     await expect(page.locator('.experience li').last()).toContainText(locale === 'ja' ? '旅行会社' : 'Travel company');
-    await expect(page.locator('.education h2')).toHaveText('Education');
     await expect(page.locator('.education')).toContainText('MIREA');
     await expect(page.locator('.contacts a[href="mailto:ercbamba@gmail.com"]')).toBeVisible();
     await expect(page.locator('.contacts a[href="https://github.com/yaufdd"]')).toBeVisible();
@@ -112,11 +155,11 @@ for (const size of [
   });
 }
 
-test('on a phone the blocks stack: picture, hello, skills, experience, education, contacts', async ({ page }) => {
+test('on a phone the blocks stack: picture, hello, projects, skills, experience, education, contacts', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto('/');
   const tops = await Promise.all(
-    ['.photo', '.hello', '.skills', '.experience', '.education', '.contacts'].map(async (s) => (await page.locator(s).boundingBox())!.y),
+    ['.photo', '.hello', '.projects', '.skills', '.experience', '.education', '.contacts'].map(async (s) => (await page.locator(s).boundingBox())!.y),
   );
   expect([...tops].sort((a, b) => a - b)).toEqual(tops);
 });
