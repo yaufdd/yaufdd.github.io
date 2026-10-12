@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const avatar = '[data-avatar]';
 
@@ -12,6 +12,55 @@ test('the 3D avatar loads, renders and reacts to a click', async ({ page }) => {
   await page.locator(`${avatar} canvas`).click();
   await expect(page.locator(avatar)).toHaveAttribute('data-jumps', '1');
   expect(errors).toEqual([]);
+});
+
+/**
+ * Mean colour and area of the figure's own pixels: those that differ from the empty frame. Comparing these instead of
+ * pixel by pixel tolerates the live figure's idle sway. PNGs are decoded in the page (no image library on the Node side).
+ */
+async function figureLook(page: Page, empty: Buffer, shot: Buffer): Promise<{ area: number; rgb: number[] }> {
+  return page.evaluate(
+    async ([emptyB64, shotB64]) => {
+      const pixels = async (b64: string) => {
+        const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${b64}`)).blob());
+        const ctx = new OffscreenCanvas(bitmap.width, bitmap.height).getContext('2d')!;
+        ctx.drawImage(bitmap, 0, 0);
+        return ctx.getImageData(0, 0, bitmap.width, bitmap.height).data;
+      };
+      const [bg, px] = await Promise.all([pixels(emptyB64!), pixels(shotB64!)]);
+      const sum = [0, 0, 0];
+      let area = 0;
+      for (let i = 0; i < px.length; i += 4) {
+        if (Math.abs(px[i]! - bg[i]!) + Math.abs(px[i + 1]! - bg[i + 1]!) + Math.abs(px[i + 2]! - bg[i + 2]!) < 24) continue;
+        for (let c = 0; c < 3; c++) sum[c]! += px[i + c]!;
+        area++;
+      }
+      return { area, rgb: sum.map((v) => v / Math.max(area, 1)) };
+    },
+    [empty.toString('base64'), shot.toString('base64')],
+  );
+}
+
+test('the still image looks like the live 3D figure, so swapping one for the other does not flash', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.goto('/');
+  const figure = page.locator(avatar);
+  await figure.scrollIntoViewIfNeeded();
+  await expect(figure).toHaveAttribute('data-state', 'ready', { timeout: 30_000 });
+  const css = (canvas: number, poster: number) =>
+    `${avatar} canvas { opacity: ${canvas} !important; transition: none !important } ${avatar} .poster { opacity: ${poster} !important; transition: none !important }`;
+  const style = await page.addStyleTag({ content: css(0, 0) });
+  const show = async (canvas: number, poster: number) => {
+    await style.evaluate((el, text) => (el.textContent = text), css(canvas, poster));
+    return figure.screenshot();
+  };
+  const empty = await show(0, 0);
+  const live = await figureLook(page, empty, await show(1, 0));
+  const still = await figureLook(page, empty, await show(0, 1));
+  // Measured: live vs a still from the same camera and light differ by < 2 per channel; the old Blender still by ~25.
+  for (let c = 0; c < 3; c++) expect(Math.abs(live.rgb[c]! - still.rgb[c]!), `channel ${c}: live ${live.rgb} vs still ${still.rgb}`).toBeLessThan(5);
+  expect(still.area / live.area).toBeGreaterThan(0.93);
+  expect(still.area / live.area).toBeLessThan(1.07);
 });
 
 test('the model file is served and stays within its size budget', async ({ request }) => {

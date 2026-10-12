@@ -14,7 +14,8 @@
     "test:e2e": "astro build && playwright test",
     "check:forbidden": "node scripts/check-forbidden.mjs",
     "cover": "node scripts/make-cover.mjs",
-    "shoot": "node scripts/shoot.mjs"
+    "shoot": "node scripts/shoot.mjs",
+    "stills": "node scripts/render-avatar-stills.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",

@@ -28,6 +28,14 @@ npm run test:e2e                   # build + browser tests
    ```
 5. `npm test && npm run test:e2e` — the tests pick up the new project automatically.
 
+## 3D avatar
+
+`public/models/avatar.glb` is shown live on the home page. Its camera and studio light live in `src/lib/avatar-stage.ts`; after changing the model, the camera or the light, re-render the still poster and the head icon with the same setup (an e2e test fails if the poster no longer looks like the live figure):
+
+```bash
+npm run stills   # → src/assets/avatar-poster.png, src/assets/avatar-head.png
+```
+
 ## Content checks
 
 A private list of terms must never appear anywhere public (repository secret `FORBIDDEN_TERMS`, one term per line; locally `forbidden.local.txt`, gitignored). Matching ignores case, full-width forms, punctuation, whitespace and inline HTML tags.

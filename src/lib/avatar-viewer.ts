@@ -1,4 +1,5 @@
 import { damp, idlePose, JUMP, jumpPose, pointerToLook } from './avatar-motion';
+import { addStudioLight, createCamera, tuneRenderer } from './avatar-stage';
 
 /**
  * Lifecycle of `[data-avatar]` (exposed as data-state for CSS and tests):
@@ -62,21 +63,11 @@ export async function mountAvatar(el: HTMLElement, modelUrl: string): Promise<vo
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    tuneRenderer(THREE, renderer);
 
     const scene = new THREE.Scene();
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    const key = new THREE.DirectionalLight(0xffffff, 1.2);
-    key.position.set(1.5, 2.5, 3);
-    scene.add(key);
-
-    // Framed like the poster: the 1-unit-tall figure fills 80% of the frame height, centred.
-    const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 20);
-    camera.position.set(0, 0.5, 1.25 / (2 * Math.tan(THREE.MathUtils.degToRad(13))));
-    camera.lookAt(0, 0.5, 0);
+    // Framed like the poster, which scripts/render-avatar-stills.mjs renders with this same camera and light.
+    const camera = createCamera(THREE, 1);
 
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
     const gltf = await loader.loadAsync(modelUrl);
@@ -84,6 +75,8 @@ export async function mountAvatar(el: HTMLElement, modelUrl: string): Promise<vo
     const figure = new THREE.Group();
     figure.add(gltf.scene);
     scene.add(figure);
+    const environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+    const studio = addStudioLight(THREE, scene, figure, environment);
 
     const canvas = renderer.domElement;
     canvas.setAttribute('aria-hidden', 'true');
@@ -130,6 +123,7 @@ export async function mountAvatar(el: HTMLElement, modelUrl: string): Promise<vo
       const jump = jumpPose((now - jumpStart) / JUMP.seconds);
 
       figure.position.y = idle.y + jump.y;
+      studio.setLift(jump.y);
       figure.scale.set(1, idle.scaleY, 1);
       figure.rotation.set(look.pitch * 0.5, look.yaw + idle.sway + jump.spin, 0);
       renderer.render(scene, camera);
