@@ -43,6 +43,5 @@ export const education = {
 export const contacts = {
   email: 'ercbamba@gmail.com',
   github: 'https://github.com/yaufdd',
-  wantedly: 'https://www.wantedly.com/id/erik_bamba',
-  languages: { ja: '日本語・ロシア語（ネイティブ）/ 英語', en: 'Japanese · Russian (native) / English' } satisfies Localized,
+  languages: { ja: '日本語・ロシア語・英語', en: 'Japanese · Russian · English' } satisfies Localized,
 };

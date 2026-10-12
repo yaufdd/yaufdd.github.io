@@ -64,7 +64,7 @@ test('about lists experience, education and languages', async ({ page }) => {
 
 test('the home page lists the languages I speak', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.contacts')).toContainText('日本語・ロシア語（ネイティブ）');
+  await expect(page.locator('.contacts')).toContainText('日本語・ロシア語・英語');
   await page.goto('/en/');
-  await expect(page.locator('.contacts')).toContainText('Japanese · Russian (native)');
+  await expect(page.locator('.contacts')).toContainText('Japanese · Russian · English');
 });

@@ -87,16 +87,30 @@ for (const locale of ['ja', 'en'] as const) {
     await expect(page.locator('.education')).toContainText('MIREA');
     await expect(page.locator('.contacts a[href="mailto:ercbamba@gmail.com"]')).toBeVisible();
     await expect(page.locator('.contacts a[href="https://github.com/yaufdd"]')).toBeVisible();
-    await expect(page.locator('.contacts a[href="https://www.wantedly.com/id/erik_bamba"]')).toHaveAttribute('rel', /noopener/);
+    await expect(page.locator('.contacts a[href*="wantedly"]')).toHaveCount(0);
   });
 }
 
-test('the left panel shows the 2D avatar as it is', async ({ page }) => {
-  await page.goto('/');
-  const img = page.locator('.photo img');
-  await expect(img).toHaveAttribute('alt', '番場エリクのイラスト');
-  expect(await img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
-});
+for (const size of [
+  { width: 1280, height: 800 },
+  { width: 375, height: 800 },
+]) {
+  test(`the left panel shows the whole 2D avatar, uncropped, at ${size.width}px`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto('/');
+    const img = page.locator('.photo img');
+    await expect(img).toHaveAttribute('alt', '番場エリクのイラスト');
+    const info = await img.evaluate((el: HTMLImageElement) => ({
+      loaded: el.complete && el.naturalWidth > 0,
+      ratio: el.naturalWidth / el.naturalHeight,
+      fit: getComputedStyle(el).objectFit,
+    }));
+    // The source is the original square illustration (not a face crop), shown with object-fit: contain.
+    expect(info.loaded).toBe(true);
+    expect(info.ratio).toBeCloseTo(1, 2);
+    expect(info.fit).toBe('contain');
+  });
+}
 
 test('on a phone the blocks stack: picture, hello, skills, experience, education, contacts', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
