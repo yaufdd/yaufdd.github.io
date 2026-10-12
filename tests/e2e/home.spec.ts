@@ -64,6 +64,17 @@ for (const size of [
     expect(Math.abs(projects!.y - education!.y)).toBeLessThanOrEqual(2);
   });
 
+  test(`the contacts row runs the full width of the page, under every column, at ${size.width}×${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto('/');
+    const [photo, experience, education, contacts] = await Promise.all(
+      ['.photo', '.experience', '.education', '.contacts'].map(async (s) => (await page.locator(s).boundingBox())!),
+    );
+    expect(Math.abs(contacts!.x - photo!.x)).toBeLessThanOrEqual(2);
+    expect(Math.abs(contacts!.x + contacts!.width - (experience!.x + experience!.width))).toBeLessThanOrEqual(2);
+    expect(contacts!.y).toBeGreaterThanOrEqual(education!.y + education!.height);
+  });
+
   test(`each project's description fits on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
     await page.setViewportSize(size);
     for (const url of ['/', '/en/']) {
