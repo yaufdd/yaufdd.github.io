@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext } from './fixtures';
 
 async function sitemapPaths(request: APIRequestContext): Promise<string[]> {
   const xml = await (await request.get('/sitemap-0.xml')).text();

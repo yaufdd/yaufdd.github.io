@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 for (const p of [
   { url: '/about/', lang: 'ja', h1: '経歴', workflow: '開発スタイル', other: '/en/about/' },

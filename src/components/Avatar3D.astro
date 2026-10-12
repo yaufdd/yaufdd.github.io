@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import poster from '../assets/avatar-poster.png';
+
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+{/* Still image first (and for no-JS / reduced motion / no WebGL); src/lib/avatar-viewer.ts swaps in the 3D figure. */}
+<figure class="avatar3d" data-avatar data-state="poster" data-jumps="0">
+  <Image
+    src={poster}
+    alt={label}
+    widths={[240, 360, 437]}
+    sizes="(min-width: 900px) 300px, 200px"
+    loading="eager"
+    fetchpriority="high"
+    class="poster"
+  />
+</figure>
+
+<script>
+  import { mountAvatar } from '../lib/avatar-viewer';
+
+  const el = document.querySelector<HTMLElement>('[data-avatar]');
+  if (el) void mountAvatar(el, '/models/avatar.glb');
+</script>
+
+<style>
+  .avatar3d {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    aspect-ratio: 437 / 728;
+  }
+  .poster {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.5s ease;
+  }
+  .avatar3d :global(canvas) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.5s ease;
+  }
+  .avatar3d[data-state='ready'] :global(canvas) {
+    opacity: 1;
+  }
+  .avatar3d[data-state='ready'] .poster {
+    opacity: 0;
+  }
+</style>

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 const PAGES = [
   { url: '/projects/visa-docs/', lang: 'ja', h1: 'ビザ申請書類 自動生成システム', other: '/en/projects/visa-docs/' },

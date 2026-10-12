@@ -1,4 +1,5 @@
 ---
+import Avatar3D from '../components/Avatar3D.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import StackGroups from '../components/StackGroups.astro';
 import type { Locale, UIKey } from '../i18n/ui';
@@ -23,6 +24,7 @@ const what: [UIKey, UIKey][] = [
 ---
 <Base locale={locale} path="" description={t(locale, 'home.lead')}>
   <section class="container hero">
+    <div class="hero-text">
     <p class="prompt mono">
       <span class="accent">$</span>{' '}<span class="sr-only">whoami</span><span data-type aria-hidden="true">whoami</span><span class="cursor" aria-hidden="true"></span>
     </p>
@@ -43,6 +45,8 @@ const what: [UIKey, UIKey][] = [
       <a class="btn primary" href={localizePath(locale, '#projects')}>{t(locale, 'home.ctaProjects')}</a>
       <a class="btn ghost" href={localizePath(locale, 'about/')}>{t(locale, 'home.ctaAbout')}</a>
     </div>
+    </div>
+    <div class="hero-avatar"><Avatar3D label={t(locale, 'home.avatarAlt')} /></div>
   </section>
 
   <section id="what" class="container block" aria-labelledby="what-title">
@@ -80,7 +84,28 @@ const what: [UIKey, UIKey][] = [
 
 <style>
   .hero {
-    padding-block: 40px 48px;
+    display: grid;
+    gap: 16px;
+    padding-block: 32px 48px;
+  }
+  .hero-text {
+    min-width: 0;
+  }
+  .hero-avatar {
+    order: -1;
+    width: 180px;
+    justify-self: center;
+  }
+  @media (min-width: 900px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      align-items: center;
+      column-gap: 40px;
+    }
+    .hero-avatar {
+      order: 0;
+      width: 300px;
+    }
   }
   .prompt,
   .out {

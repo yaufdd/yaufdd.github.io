@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './fixtures';
 
 const opacityOf = (page: Page, selector: string) =>
   page.locator(selector).evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('home pages exist and declare their language', async ({ page }) => {
   expect((await page.goto('/'))?.status()).toBe(200);
