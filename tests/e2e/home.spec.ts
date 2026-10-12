@@ -64,15 +64,16 @@ for (const size of [
     expect(Math.abs(projects!.y - education!.y)).toBeLessThanOrEqual(2);
   });
 
-  test(`the contacts row runs the full width of the page, under every column, at ${size.width}×${size.height}`, async ({ page }) => {
+  test(`the contacts sit together, centred under the columns, at ${size.width}×${size.height}`, async ({ page }) => {
     await page.setViewportSize(size);
     await page.goto('/');
-    const [photo, experience, education, contacts] = await Promise.all(
-      ['.photo', '.experience', '.education', '.contacts'].map(async (s) => (await page.locator(s).boundingBox())!),
-    );
-    expect(Math.abs(contacts!.x - photo!.x)).toBeLessThanOrEqual(2);
-    expect(Math.abs(contacts!.x + contacts!.width - (experience!.x + experience!.width))).toBeLessThanOrEqual(2);
-    expect(contacts!.y).toBeGreaterThanOrEqual(education!.y + education!.height);
+    const [photo, experience, education] = await Promise.all(['.photo', '.experience', '.education'].map(async (s) => (await page.locator(s).boundingBox())!));
+    const items = await Promise.all((await page.locator('.contacts li').all()).map(async (li) => (await li.boundingBox())!));
+    const left = items[0]!.x;
+    const right = items.at(-1)!.x + items.at(-1)!.width;
+    expect(Math.abs((left + right) / 2 - (photo!.x + experience!.x + experience!.width) / 2)).toBeLessThanOrEqual(4);
+    for (let i = 1; i < items.length; i++) expect(items[i]!.x - (items[i - 1]!.x + items[i - 1]!.width)).toBeLessThanOrEqual(48);
+    expect(items[0]!.y).toBeGreaterThanOrEqual(education!.y + education!.height);
   });
 
   test(`each project's description fits on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
