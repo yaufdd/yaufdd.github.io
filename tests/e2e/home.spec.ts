@@ -57,3 +57,9 @@ test('./projects in the nav jumps to the list', async ({ page }) => {
   await expect(page).toHaveURL('/#projects');
   await expect(page.locator('#projects')).toBeInViewport();
 });
+
+test('the Infra group lists AWS', async ({ page }) => {
+  await page.goto('/');
+  const infra = page.locator('.stack .group', { has: page.getByRole('heading', { name: 'Infra', exact: true }) });
+  await expect(infra.locator('li', { hasText: /^AWS$/ })).toHaveCount(1);
+});
