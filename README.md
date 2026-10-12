@@ -30,7 +30,7 @@ npm run test:e2e                   # build + browser tests
 
 ## 3D avatar
 
-`public/models/avatar.glb` is shown live on the home page. Its camera and studio light live in `src/lib/avatar-stage.ts`; after changing the model, the camera or the light, re-render the still poster with the same setup (an e2e test fails if the poster no longer looks like the live figure):
+`public/models/avatar.glb` is shown live on the home page. It is cut at the neck: the `neck` node holds the head, so the head turns on its own (`src/lib/avatar-motion.ts`). `avatar-blink.webp` and `avatar-blink-normal.webp` are closed-eye copies of the model's base colour and normal maps (same UV atlas), swapped in for a blink. Its camera and studio light live in `src/lib/avatar-stage.ts`; after changing the model, the camera or the light, re-render the still poster with the same setup (an e2e test fails if the poster no longer looks like the live figure):
 
 ```bash
 npm run stills   # → src/assets/avatar-poster.png

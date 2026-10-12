@@ -9,6 +9,7 @@ test('the 3D avatar loads, renders and reacts to a click', async ({ page }) => {
   await expect(page.locator(`${avatar} img.poster`)).toHaveAttribute('alt', '番場エリクの 3D アバター');
   await expect(page.locator(avatar)).toHaveAttribute('data-state', 'ready', { timeout: 20_000 });
   await expect(page.locator(`${avatar} canvas`)).toBeVisible();
+  await expect(page.locator(avatar), 'the model has a separate head').toHaveAttribute('data-head', 'turns');
   await page.locator(`${avatar} canvas`).click();
   await expect(page.locator(avatar)).toHaveAttribute('data-jumps', '1');
   expect(errors).toEqual([]);
@@ -61,6 +62,20 @@ test('the still image looks like the live 3D figure, so swapping one for the oth
   for (let c = 0; c < 3; c++) expect(Math.abs(live.rgb[c]! - still.rgb[c]!), `channel ${c}: live ${live.rgb} vs still ${still.rgb}`).toBeLessThan(5);
   expect(still.area / live.area).toBeGreaterThan(0.93);
   expect(still.area / live.area).toBeLessThan(1.07);
+});
+
+test('the avatar blinks every few seconds', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator(avatar)).toHaveAttribute('data-state', 'ready', { timeout: 20_000 });
+  await expect(page.locator(avatar)).toHaveAttribute('data-blinks', /^[1-9][0-9]*$/, { timeout: 15_000 });
+});
+
+test('the closed-eye textures are served and stay within their size budget', async ({ request }) => {
+  for (const file of ['avatar-blink.webp', 'avatar-blink-normal.webp']) {
+    const response = await request.get(`/models/${file}`);
+    expect(response.status(), file).toBe(200);
+    expect((await response.body()).byteLength, file).toBeLessThan(300 * 1024);
+  }
 });
 
 test('the model file is served and stays within its size budget', async ({ request }) => {

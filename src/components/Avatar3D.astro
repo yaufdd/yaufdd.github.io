@@ -8,7 +8,7 @@ interface Props {
 const { label } = Astro.props;
 ---
 {/* Still image first (and for no-JS / reduced motion / no WebGL); src/lib/avatar-viewer.ts swaps in the 3D figure. */}
-<figure class="avatar3d" data-avatar data-state="poster" data-jumps="0">
+<figure class="avatar3d" data-avatar data-state="poster" data-jumps="0" data-blinks="0">
   <Image
     src={poster}
     alt={label}
@@ -24,7 +24,7 @@ const { label } = Astro.props;
   import { mountAvatar } from '../lib/avatar-viewer';
 
   const el = document.querySelector<HTMLElement>('[data-avatar]');
-  if (el) void mountAvatar(el, '/models/avatar.glb');
+  if (el) void mountAvatar(el, '/models/avatar.glb', { map: '/models/avatar-blink.webp', normalMap: '/models/avatar-blink-normal.webp' });
 </script>
 
 <style>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { damp, idlePose, JUMP, jumpPose, LOOK, pointerToLook } from '../../src/lib/avatar-motion';
+import { BLINK, bodyYawFor, damp, HEAD, headPose, idlePose, JUMP, jumpPose, LOOK, nextBlinkIn, pointerToLook } from '../../src/lib/avatar-motion';
 
 const rect = { left: 100, top: 100, width: 200, height: 400 };
 const viewport = { width: 1000, height: 800 };
@@ -56,5 +56,49 @@ describe('jumpPose', () => {
   it('clamps progress outside 0..1', () => {
     expect(jumpPose(-1)).toEqual(jumpPose(0));
     expect(jumpPose(2)).toEqual(jumpPose(1));
+  });
+});
+
+describe('bodyYawFor / headPose', () => {
+  it('the head leads: the body turns only part of the way and the head turns the rest', () => {
+    const look = { yaw: 0.5, pitch: 0 };
+    const body = bodyYawFor(look.yaw);
+    expect(body).toBeGreaterThan(0);
+    expect(body).toBeLessThan(look.yaw);
+    expect(body + headPose(look, body).yaw).toBeCloseTo(look.yaw, 10);
+  });
+  it('nods down towards a pointer below, but barely tips back (further, the hair goes through the hood)', () => {
+    expect(headPose({ yaw: 0, pitch: LOOK.maxPitch }, 0).pitch).toBeGreaterThan(0);
+    expect(headPose({ yaw: 0, pitch: LOOK.maxPitch }, 0).pitch).toBeLessThanOrEqual(HEAD.maxPitch);
+    expect(headPose({ yaw: 0, pitch: -LOOK.maxPitch }, 0).pitch).toBe(HEAD.minPitch);
+    expect(HEAD.minPitch).toBeGreaterThanOrEqual(-0.08);
+  });
+  it('tilts a little into the turn, and not at all when looking straight ahead', () => {
+    const left = headPose({ yaw: -0.5, pitch: 0 }, bodyYawFor(-0.5));
+    const right = headPose({ yaw: 0.5, pitch: 0 }, bodyYawFor(0.5));
+    expect(Math.sign(left.roll)).toBe(-Math.sign(right.roll));
+    expect(Math.abs(right.roll)).toBeGreaterThan(0);
+    expect(Math.abs(right.roll)).toBeLessThan(0.1);
+    expect(headPose({ yaw: 0, pitch: 0 }, 0).roll + 0).toBe(0);
+  });
+});
+
+describe('nextBlinkIn', () => {
+  it('waits a natural few seconds between blinks', () => {
+    for (const r of [0.2, 0.5, 0.999]) {
+      const seq = [0.99, r];
+      const wait = nextBlinkIn(() => seq.shift()!);
+      expect(wait).toBeGreaterThanOrEqual(BLINK.minGap);
+      expect(wait).toBeLessThanOrEqual(BLINK.maxGap);
+    }
+  });
+  it('now and then blinks twice in quick succession', () => {
+    expect(nextBlinkIn(() => 0)).toBe(BLINK.doubleGap);
+    expect(BLINK.doubleGap).toBeLessThan(0.5);
+    expect(BLINK.doubleGap).toBeGreaterThan(BLINK.seconds);
+  });
+  it('keeps the eyes shut only for a moment', () => {
+    expect(BLINK.seconds).toBeGreaterThan(0.08);
+    expect(BLINK.seconds).toBeLessThan(0.2);
   });
 });
