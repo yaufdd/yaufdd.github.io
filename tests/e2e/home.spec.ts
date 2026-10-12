@@ -49,14 +49,19 @@ for (const size of [
     expect(overlaps).toEqual([]);
   });
 
-  test(`the square 2D card starts level with the greeting and the projects sit under it at ${size.width}×${size.height}`, async ({ page }) => {
+  test(`the square 2D card starts level with the greeting, education under it, projects under the greeting at ${size.width}×${size.height}`, async ({ page }) => {
     await page.setViewportSize(size);
     await page.goto('/');
-    const [photo, greeting, projects] = await Promise.all(['.photo', '.hello h1', '.projects'].map(async (s) => (await page.locator(s).boundingBox())!));
+    const [photo, greeting, education, projects] = await Promise.all(
+      ['.photo', '.hello h1', '.education', '.projects'].map(async (s) => (await page.locator(s).boundingBox())!),
+    );
     expect(photo!.width / photo!.height).toBeCloseTo(1, 1);
     expect(Math.abs(photo!.y - greeting!.y)).toBeLessThanOrEqual(8);
-    expect(projects!.y).toBeGreaterThanOrEqual(photo!.y + photo!.height);
-    expect(Math.abs(projects!.x - photo!.x)).toBeLessThanOrEqual(2);
+    expect(education!.y).toBeGreaterThanOrEqual(photo!.y + photo!.height);
+    expect(Math.abs(education!.x - photo!.x)).toBeLessThanOrEqual(2);
+    expect(projects!.y).toBeGreaterThanOrEqual(greeting!.y + greeting!.height);
+    expect(Math.abs(projects!.x - greeting!.x)).toBeLessThanOrEqual(2);
+    expect(Math.abs(projects!.y - education!.y)).toBeLessThanOrEqual(2);
   });
 
   test(`each project's description fits on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {

@@ -296,15 +296,15 @@ const links = [
       grid-template-rows: auto minmax(0, 1fr) auto;
       grid-template-areas:
         'photo hello skills'
-        'projects edu exp'
-        'projects contacts contacts';
+        'edu projects exp'
+        'edu contacts contacts';
       gap: 0 40px;
       max-width: 1240px;
       height: 100dvh;
       padding: 44px 0 40px 44px;
       overflow: hidden;
     }
-    /* Square, exactly the picture, its top level with the greeting; the projects take the space under it. */
+    /* Square, exactly the picture, its top level with the greeting; education takes the space under it. */
     .photo {
       grid-area: photo;
       align-self: start;
