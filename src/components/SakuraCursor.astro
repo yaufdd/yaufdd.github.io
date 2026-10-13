@@ -8,6 +8,14 @@
   if (canvas) startSakura(canvas);
 </script>
 
+<style is:global>
+  /* The arrow is hidden while the petals run (class set by startSakura). */
+  html.sakura-cursor,
+  html.sakura-cursor * {
+    cursor: none !important;
+  }
+</style>
+
 <style>
   .sakura {
     position: fixed;

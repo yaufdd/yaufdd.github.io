@@ -44,6 +44,14 @@ test('the petals never get in the way of clicks', async ({ page }) => {
 test('the case pages stay calm: no petals there', async ({ page }) => {
   await page.goto('/projects/visa-docs/');
   await expect(page.locator('[data-sakura]')).toHaveCount(0);
+  await expect(page.locator('body')).not.toHaveCSS('cursor', 'none');
+});
+
+test('on the home page the arrow is hidden: the petals show where the pointer is', async ({ page }) => {
+  await page.goto('/');
+  for (const target of ['body', '.projects a', '.hello h1', '[data-avatar]']) {
+    await expect(page.locator(target).first(), target).toHaveCSS('cursor', 'none');
+  }
 });
 
 test.describe('reduced motion', () => {
@@ -54,6 +62,11 @@ test.describe('reduced motion', () => {
     await sweep(page);
     await page.waitForTimeout(300);
     expect(await paintedPixels(page)).toBe(0);
+  });
+  test('without petals the normal arrow stays, so the pointer is never lost', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('body')).not.toHaveCSS('cursor', 'none');
+    await expect(page.locator('.projects a').first()).toHaveCSS('cursor', 'pointer');
   });
 });
 
