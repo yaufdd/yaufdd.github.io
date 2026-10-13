@@ -103,6 +103,14 @@ test('on a phone the flow runs top to bottom', async ({ page }) => {
   expect([...tops].sort((a, b) => a - b)).toEqual(tops);
 });
 
+test('nothing fades in: every card and arrow is there from the start, even far down the page', async ({ page }) => {
+  await page.goto('/projects/visa-docs/');
+  await expect(page.locator('.story [data-reveal]')).toHaveCount(0);
+  for (const card of await page.locator('.story li').all()) await expect(card).toHaveCSS('opacity', '1');
+  const arrow = await page.locator('#story-after li.step').first().evaluate((el) => getComputedStyle(el, '::after').transform);
+  expect(arrow).toMatch(/^(none|matrix(1, 0, 0, 1, 0, 0))$/);
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   test('every card is visible', async ({ page }) => {

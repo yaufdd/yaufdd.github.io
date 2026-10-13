@@ -30,10 +30,10 @@ const slug = slugOf(entry);
   <section id="story-task" aria-labelledby="story-task-title">
     <h2 id="story-task-title">{t(locale, 'story.task')}</h2>
     <div class="task">
-      <p class="statement" data-reveal style="--i: 1">{story.task.text}</p>
+      <p class="statement">{story.task.text}</p>
       {
         story.task.metric && (
-          <div class="metric" data-reveal style="--i: 4">
+          <div class="metric">
             <p class="numbers">
               <span class="before">{story.task.metric.before}</span>
               <small>{story.task.metric.unit}</small>
@@ -55,7 +55,7 @@ const slug = slugOf(entry);
         <h2 id="story-before-title">{t(locale, 'story.before')}</h2>
         <Flow flow={story.before} />
         {story.before.note && (
-          <p class="note pain" data-reveal style="--i: 9">
+          <p class="note pain">
             <Icon name="triangle-alert" />
             {story.before.note}
           </p>
@@ -67,7 +67,7 @@ const slug = slugOf(entry);
   <section id="story-after" aria-labelledby="story-after-title">
     <h2 id="story-after-title">{t(locale, 'story.after')}</h2>
     <Flow flow={story.after} />
-    {story.after.note && <p class="note" data-reveal style="--i: 10">{story.after.note}</p>}
+    {story.after.note && <p class="note">{story.after.note}</p>}
   </section>
 
   <section id="story-architecture" aria-labelledby="story-architecture-title">
@@ -75,8 +75,8 @@ const slug = slugOf(entry);
     <div class="arch">
       <ol class="layers">
         {
-          story.architecture.layers.map((layer, i) => (
-            <li data-reveal style={`--i: ${i + 1}`}>
+          story.architecture.layers.map((layer) => (
+            <li>
               <Icon name={layer.icon} />
               <b>{layer.title}</b>
               {layer.note && <span>{layer.note}</span>}
@@ -86,8 +86,8 @@ const slug = slugOf(entry);
       </ol>
       <ul class="leaves" style={`--n: ${story.architecture.leaves.length}`}>
         {
-          story.architecture.leaves.map((leaf, i) => (
-            <li data-reveal style={`--i: ${story.architecture.layers.length + i + 1}`}>
+          story.architecture.leaves.map((leaf) => (
+            <li>
               <Icon name={leaf.icon} />
               <b>{leaf.title}</b>
               {leaf.note && <span>{leaf.note}</span>}
@@ -96,15 +96,15 @@ const slug = slugOf(entry);
         }
       </ul>
     </div>
-    {story.architecture.note && <p class="note" data-reveal style="--i: 9">{story.architecture.note}</p>}
+    {story.architecture.note && <p class="note">{story.architecture.note}</p>}
   </section>
 
   <section id="story-highlights" aria-labelledby="story-highlights-title">
     <h2 id="story-highlights-title">{t(locale, 'story.highlights')}</h2>
     <ul class="highlights">
       {
-        story.highlights.map((h, i) => (
-          <li data-reveal style={`--i: ${i + 1}`}>
+        story.highlights.map((h) => (
+          <li>
             <b>{h.title}</b>
             <span>{h.text}</span>
           </li>
@@ -116,7 +116,7 @@ const slug = slugOf(entry);
   <section id="story-outcome" aria-labelledby="story-outcome-title">
     <h2 id="story-outcome-title">{t(locale, 'story.outcome')}</h2>
     <ul class="outcome">
-      {story.outcome.map((line, i) => <li data-reveal style={`--i: ${i + 1}`}>{line}</li>)}
+      {story.outcome.map((line) => <li>{line}</li>)}
     </ul>
     <p class="links">
       {next && <a class="next" href={localizePath(locale, `projects/${slugOf(next)}/`)}>{t(locale, 'story.nextProject')}: {next.data.title} →</a>}
@@ -130,11 +130,6 @@ const slug = slugOf(entry);
   </details>
 </div>
 
-<script>
-  import { startMotion } from '../../lib/motion';
-
-  startMotion();
-</script>
 
 <style>
   .story {

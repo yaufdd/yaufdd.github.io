@@ -17,7 +17,7 @@ const cols = flow.steps.length;
 <ol class="flow" style={`--cols: ${cols}`}>
   {
     flow.steps.map((step, i) => (
-      <li class="step" data-link={i < cols - 1 ? step.link : 'none'} data-reveal style={`--i: ${i * 2 + 1}`}>
+      <li class="step" data-link={i < cols - 1 ? step.link : 'none'}>
         <Icon name={step.icon} />
         <b>{step.title}</b>
         {step.note && <span>{step.note}</span>}
@@ -26,7 +26,7 @@ const cols = flow.steps.length;
   }
   {
     flow.result && (
-      <li class="result" data-reveal style={`--col: ${flow.result.from + 1}; --i: ${cols * 2 + 1}`}>
+      <li class="result" style={`--col: ${flow.result.from + 1}`}>
         <Icon name={flow.result.icon} />
         <b>{flow.result.title}</b>
         {flow.result.note && <span>{flow.result.note}</span>}
@@ -117,21 +117,6 @@ const cols = flow.steps.length;
     height: 44px;
   }
 
-  /* Arrows draw themselves just after their card appears. */
-  :global(.motion) .step::after {
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 0.45s ease calc(var(--i, 0) * 90ms + 300ms);
-  }
-  :global(.motion) .result::before {
-    transform: scaleY(0);
-    transform-origin: top center;
-    transition: transform 0.45s ease calc(var(--i, 0) * 90ms + 150ms);
-  }
-  :global(.motion) .step:global(.is-in)::after,
-  :global(.motion) .result:global(.is-in)::before {
-    transform: none;
-  }
 
   /* Phones: one column, arrows pointing down. */
   @media (max-width: 899px) {
@@ -160,10 +145,6 @@ const cols = flow.steps.length;
     .result::before {
       bottom: calc(100% + 8px);
       height: 40px;
-    }
-    :global(.motion) .step::after {
-      transform: scaleY(0);
-      transform-origin: top center;
     }
   }
 </style>
