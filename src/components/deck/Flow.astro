@@ -1,0 +1,169 @@
+---
+import type { Project } from '../../lib/content';
+import Icon from './Icon.astro';
+
+type Flow = NonNullable<NonNullable<Project['data']['deck']>['before']>;
+
+interface Props {
+  flow: Flow;
+}
+const { flow } = Astro.props;
+const cols = flow.steps.length;
+---
+{/*
+  Steps in a row joined by arrows (one way, or back and forth); the result hangs under the step it comes from.
+  On a phone everything runs top to bottom. The arrows are CSS pseudo-elements, hidden from screen readers.
+*/}
+<ol class="flow" style={`--cols: ${cols}`}>
+  {
+    flow.steps.map((step, i) => (
+      <li class="step" data-link={i < cols - 1 ? step.link : 'none'} data-reveal style={`--i: ${i * 2 + 1}`}>
+        <Icon name={step.icon} />
+        <b>{step.title}</b>
+        {step.note && <span>{step.note}</span>}
+      </li>
+    ))
+  }
+  {
+    flow.result && (
+      <li class="result" data-reveal style={`--col: ${flow.result.from + 1}; --i: ${cols * 2 + 1}`}>
+        <Icon name={flow.result.icon} />
+        <b>{flow.result.title}</b>
+        {flow.result.note && <span>{flow.result.note}</span>}
+      </li>
+    )
+  }
+</ol>
+
+<style>
+  .flow {
+    --gap: 72px;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 64px var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 22px 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 10px 28px rgb(0 0 0 / 0.06);
+    text-align: center;
+  }
+  li :global(.icon) {
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border-radius: 50%;
+    background: #f1f1f1;
+    color: var(--fg);
+  }
+  b {
+    font-size: 16px;
+    font-weight: 800;
+  }
+  span {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .result {
+    grid-row: 2;
+    grid-column: var(--col);
+    background: var(--tag-bg);
+    color: var(--tag-fg);
+  }
+  .result span {
+    color: #d6d6d6;
+  }
+  .result :global(.icon) {
+    background: #4a4a4a;
+    color: #fff;
+  }
+
+  /* Arrows: drawn with a mask so they take the text colour. */
+  .step:not([data-link='none'])::after,
+  .result::before {
+    position: absolute;
+    background: var(--fg);
+    content: '';
+    -webkit-mask: var(--arrow) center / contain no-repeat;
+    mask: var(--arrow) center / contain no-repeat;
+  }
+  .step::after {
+    --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 16'%3E%3Cpath d='M2 8h40M34 2l8 6-8 6' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    top: calc(50% - 8px);
+    left: calc(100% + 12px);
+    width: calc(var(--gap) - 24px);
+    height: 16px;
+  }
+  .step[data-link='both']::after {
+    --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 24'%3E%3Cpath d='M4 7h40M36 1l8 6-8 6M44 17H4M12 11l-8 6 8 6' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    top: calc(50% - 12px);
+    height: 24px;
+  }
+  .result::before {
+    --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 48'%3E%3Cpath d='M8 2v40M2 34l6 8 6-8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    bottom: calc(100% + 10px);
+    left: calc(50% - 8px);
+    width: 16px;
+    height: 44px;
+  }
+
+  /* Arrows draw themselves just after their card appears. */
+  :global(.motion) .step::after {
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.45s ease calc(var(--i, 0) * 90ms + 300ms);
+  }
+  :global(.motion) .result::before {
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: transform 0.45s ease calc(var(--i, 0) * 90ms + 150ms);
+  }
+  :global(.motion) .step:global(.is-in)::after,
+  :global(.motion) .result:global(.is-in)::before {
+    transform: none;
+  }
+
+  /* Phones: one column, arrows pointing down. */
+  @media (max-width: 899px) {
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 56px;
+    }
+    .result {
+      grid-row: auto;
+      grid-column: auto;
+    }
+    .step::after {
+      --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 48'%3E%3Cpath d='M8 2v40M2 34l6 8 6-8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      top: calc(100% + 8px);
+      left: calc(50% - 8px);
+      width: 16px;
+      height: 40px;
+    }
+    .step[data-link='both']::after {
+      --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 48'%3E%3Cpath d='M7 4v40M1 36l6 8 6-8M17 44V4M11 12l6-8 6 8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      top: calc(100% + 8px);
+      left: calc(50% - 12px);
+      width: 24px;
+      height: 40px;
+    }
+    .result::before {
+      bottom: calc(100% + 8px);
+      height: 40px;
+    }
+    :global(.motion) .step::after {
+      transform: scaleY(0);
+      transform-origin: top center;
+    }
+  }
+</style>

@@ -11,13 +11,49 @@ devProcess: Claude Code で「仕様 → 実装計画 → TDD → レビュー�
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — ターミナル風のカバー画像"
 order: 1
+deck:
+  task:
+    text: "ビザ申請の書類は、担当者がスキャンを見ながら手で作っていました。システムで、1 人あたりの作業が 1 時間から 15 分になりました。"
+    metric: { before: "60", after: "15", unit: "分", label: "1 人あたりの作業時間", note: "30 人のツアーなら 30 時間 → 7.5 時間" }
+  before:
+    steps:
+      - { icon: pen-line, title: "旅行者", note: "Word の申請書に手で記入" }
+      - { icon: user-cog, title: "担当者", note: "スキャンを見ながら手で転記" }
+    result: { icon: files, title: "約 10 個の書類", note: "PDF と Word を 1 つずつ作成", from: 1 }
+    note: "ローマ字や日付のミスが 1 つあるだけで、書類は差し戻されます。"
+  after:
+    steps:
+      - { icon: smartphone, title: "オンラインフォーム", note: "旅行者が自分で入力" }
+      - { icon: layout-dashboard, title: "管理画面", note: "担当者は確認するだけ", link: both }
+      - { icon: sparkles, title: "AI（OCR + LLM）", note: "スキャンを読み取り JSON で返す" }
+    result: { icon: folder-check, title: "約 10 個の完成ファイル", note: "グループ全員分を一括生成", from: 1 }
+    note: "グループ全員の入力がそろった時点で、書類一式がまとめて生成されます。"
+  architecture:
+    layers:
+      - { icon: globe, title: "ブラウザ", note: "管理画面・旅行者フォーム" }
+      - { icon: shield, title: "Traefik → nginx", note: "TLS・React SPA・/api プロキシ" }
+      - { icon: server, title: "Go バックエンド", note: "単一バイナリ・chi" }
+    leaves:
+      - { icon: database, title: "PostgreSQL", note: "組織ごとに分離" }
+      - { icon: cloud, title: "Yandex Cloud", note: "GPT・Vision OCR" }
+      - { icon: file-code, title: "Python", note: "DOCX・PDF を生成" }
+    note: "依存の向きが一方向のレイヤードモノリス。バイナリは 1 つです。"
+  highlights:
+    - { title: "組織 ID は必須の引数", text: "フィルタの書き忘れはコンパイルエラー。RLS の役割をコンパイラが担います。" }
+    - { title: "AI は必要な所だけ", text: "ルールで決まる処理は Go のコード。最終判断は常にコードが下します。" }
+    - { title: "失敗の扱いを使い分け", text: "翻訳の失敗は生成を止め、格変化の失敗は警告にとどめて続行します。" }
+    - { title: "モデルのフォールバック", text: "YandexGPT が回答を拒否したら、Qwen3-235B が答えます。" }
+    - { title: "個人データは国内に", text: "AI もすべて国内のクラウドで実行（152-FZ に対応）。" }
+  outcome:
+    - "次の一手は、書類生成をジョブキューに移すこと。"
+    - "規模に応じて、ハンドラーからサービス層を切り出します。"
 ---
 
 ## 課題
 
 ビザ申請の書類づくりは、担当者がパスポート・航空券・ホテルのバウチャーのスキャンを見ながら、内容を一つずつ手で転記する作業でした。
 
-1 つのグループにつき、旅程表、委任状、申請書（PDF）、ビザ申請センターへの申込書と提出リスト、数次ビザ用の書類など 6 種類の書類が必要です。ローマ字表記や日付のわずかなミスでも書類は差し戻され、旅行者の出発スケジュールに直接影響します。
+1 つのグループにつき、旅程表、委任状、申請書（PDF）、ビザ申請センターへの申込書と提出リスト、数次ビザ用の書類など、約 10 個の書類が必要です。ローマ字表記や日付のわずかなミスでも書類は差し戻され、旅行者の出発スケジュールに直接影響します。
 
 ## 解決策
 
@@ -27,7 +63,7 @@ order: 1
 2. **旅行者がフォームに入力** — 旅行者本人が多段階のオンラインフォームに入力する（個人情報の利用同意、SmartCaptcha によるボット対策付き）
 3. **スキャンを読み取り** — パスポート・航空券・ホテルのバウチャーを Yandex Vision OCR と YandexGPT で読み取り、項目ごとに自動入力。担当者は画面上で確認・修正できる
 4. **ルールで検証・補完** — 翻字、ロシア語の格変化（委任状用）、国籍、出生地、滞在日数などは決定的な Go のコードで計算・チェックする
-5. **書類一式を生成** — 6 種類の書類をまとめて ZIP でダウンロードする
+5. **書類一式を生成** — 約 10 個の書類をまとめて ZIP でダウンロードする
 
 ホテル情報は、全組織共通のカタログと組織ごとの独自カタログを併用できます。
 

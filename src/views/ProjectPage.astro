@@ -2,11 +2,12 @@
 import '../styles/prose.css';
 import { render } from 'astro:content';
 import CaseMeta from '../components/CaseMeta.astro';
+import Deck from '../components/deck/Deck.astro';
 import Lightbox from '../components/Lightbox.astro';
 import type { Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
 import Base from '../layouts/Base.astro';
-import { slugOf, type Project } from '../lib/content';
+import { getProjects, slugOf, type Project } from '../lib/content';
 
 interface Props {
   locale: Locale;
@@ -16,16 +17,28 @@ const { locale, entry } = Astro.props;
 const { data } = entry;
 const slug = slugOf(entry);
 const { Content } = await render(entry);
+// The project the last slide points to: the next one in the home page order, wrapping around.
+const projects = await getProjects(locale);
+const at = projects.findIndex((p) => slugOf(p) === slug);
+const next = projects.length > 1 ? projects[(at + 1) % projects.length] : undefined;
 ---
 <Base locale={locale} path={`projects/${slug}/`} title={data.title} description={data.summary} ogImage={data.cover}>
-  <article class="container case">
-    <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>
-    <p class="crumb">~/projects/{slug}</p>
-    <h1 class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
-    <p class="lead">{data.summary}</p>
-    <CaseMeta locale={locale} data={data} />
-    <div class="prose"><Content /></div>
-  </article>
+  {
+    data.deck ? (
+      <Deck locale={locale} entry={entry} next={next}>
+        <Content />
+      </Deck>
+    ) : (
+      <article class="container case">
+        <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>
+        <p class="crumb">~/projects/{slug}</p>
+        <h1 class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
+        <p class="lead">{data.summary}</p>
+        <CaseMeta locale={locale} data={data} />
+        <div class="prose"><Content /></div>
+      </article>
+    )
+  }
   <Lightbox locale={locale} />
 </Base>
 

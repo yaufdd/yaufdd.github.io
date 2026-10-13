@@ -43,6 +43,8 @@ async function figureLook(page: Page, empty: Buffer, shot: Buffer): Promise<{ ar
 }
 
 test('the still image looks like the live 3D figure, so swapping one for the other does not flash', async ({ page }) => {
+  // Renders the 350k-triangle model on the CPU (headless WebGL) while the rest of the suite runs in parallel.
+  test.slow();
   await page.setViewportSize({ width: 375, height: 900 });
   await page.goto('/');
   const figure = page.locator(avatar);

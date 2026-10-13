@@ -11,13 +11,49 @@ devProcess: Built with Claude Code in a spec → plan → TDD → review loop.
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — terminal-style cover image"
 order: 1
+deck:
+  task:
+    text: "Visa paperwork was put together by hand from scans. With the system, the work per traveller went from an hour to 15 minutes."
+    metric: { before: "60", after: "15", unit: "min", label: "of work per traveller", note: "A 30-person tour: 30 hours → 7.5 hours" }
+  before:
+    steps:
+      - { icon: pen-line, title: "Traveller", note: "fills in a Word form by hand" }
+      - { icon: user-cog, title: "Staff", note: "retypes everything from the scans" }
+    result: { icon: files, title: "~10 documents", note: "PDF and Word, one at a time", from: 1 }
+    note: "One typo in a name or a date, and the documents come back."
+  after:
+    steps:
+      - { icon: smartphone, title: "Online form", note: "travellers fill it in themselves" }
+      - { icon: layout-dashboard, title: "Admin panel", note: "staff only check", link: both }
+      - { icon: sparkles, title: "AI (OCR + LLM)", note: "reads the scans, returns JSON" }
+    result: { icon: folder-check, title: "~10 ready files", note: "for the whole group at once", from: 1 }
+    note: "As soon as everyone in the group has filled in the form, the whole set is generated in one go."
+  architecture:
+    layers:
+      - { icon: globe, title: "Browser", note: "admin panel · traveller form" }
+      - { icon: shield, title: "Traefik → nginx", note: "TLS · React SPA · /api proxy" }
+      - { icon: server, title: "Go backend", note: "one binary · chi" }
+    leaves:
+      - { icon: database, title: "PostgreSQL", note: "isolated per organisation" }
+      - { icon: cloud, title: "Yandex Cloud", note: "GPT · Vision OCR" }
+      - { icon: file-code, title: "Python", note: "generates DOCX and PDF" }
+    note: "A layered monolith with one-way dependencies, shipped as a single binary."
+  highlights:
+    - { title: "Tenant ID is a required argument", text: "A forgotten filter does not compile: the compiler does the job of row-level security." }
+    - { title: "AI only where it is needed", text: "Rules live in Go code, and the code always has the last word." }
+    - { title: "Failures handled on purpose", text: "A failed translation stops generation; a failed declension only warns." }
+    - { title: "Model fallback", text: "If YandexGPT refuses to answer, Qwen3-235B steps in." }
+    - { title: "Personal data stays at home", text: "All AI runs in a domestic cloud, as Russian law 152-FZ requires." }
+  outcome:
+    - "Next: move document generation to a job queue."
+    - "As it grows, pull a service layer out of the handlers."
 ---
 
 ## Problem
 
 Preparing visa paperwork meant staff reading passport, flight ticket and hotel voucher scans and copying every field by hand.
 
-Each group needs six documents — itinerary, power of attorney, the application form (PDF), the visa centre request and submission list, and multi-entry visa papers. A single typo in a romanised name or a date gets the documents sent back and puts the travellers' departure at risk.
+Each group needs about ten documents — itinerary, power of attorney, the application form (PDF), the visa centre request and submission list, and multi-entry visa papers. A single typo in a romanised name or a date gets the documents sent back and puts the travellers' departure at risk.
 
 ## Solution
 
@@ -27,7 +63,7 @@ The manual copying is gone; staff only review and confirm.
 2. **Travellers fill in a form** — a multi-step online form with consent collection and SmartCaptcha bot protection
 3. **Scans are read automatically** — Yandex Vision OCR and YandexGPT extract the fields from passports, tickets and hotel vouchers; staff review and correct them on screen
 4. **Rules validate and complete the data** — transliteration, Russian name declension (for the power of attorney), nationality, place of birth and length of stay are computed and checked by deterministic Go code
-5. **The document set is generated** — all six documents in one ZIP
+5. **The document set is generated** — all ten or so documents in one ZIP
 
 Hotel data comes from a shared catalogue plus each organisation's own entries.
 

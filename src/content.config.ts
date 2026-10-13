@@ -1,8 +1,41 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { ICON_NAMES } from './components/deck/icons';
 
 const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Use the YYYY-MM format, e.g. "2026-04"');
+
+/*
+ * Slides for a case study told as a presentation (src/components/deck/). Texts are capped: a slide shows one idea
+ * in a few words, and the full story stays in the Markdown body under "Read more".
+ */
+const card = z.object({
+  icon: z.enum(ICON_NAMES),
+  title: z.string().min(1).max(28),
+  note: z.string().min(1).max(48).optional(),
+});
+const flow = z
+  .object({
+    /** `link` is the arrow to the next step: one way (next) or back and forth (both). */
+    steps: z.array(card.extend({ link: z.enum(['next', 'both']).default('next') })).min(2).max(5),
+    /** What comes out, hanging under the step it comes `from` (0-based). */
+    result: card.extend({ from: z.number().int().min(0) }).optional(),
+    note: z.string().min(1).max(140).optional(),
+  })
+  .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' });
+const deck = z.object({
+  task: z.object({
+    text: z.string().min(1).max(200),
+    metric: z
+      .object({ before: z.string().min(1), after: z.string().min(1), unit: z.string().min(1), label: z.string().min(1), note: z.string().min(1).optional() })
+      .optional(),
+  }),
+  before: flow.optional(),
+  after: flow,
+  architecture: z.object({ layers: z.array(card).min(1).max(4), leaves: z.array(card).min(1).max(4), note: z.string().min(1).max(140).optional() }),
+  highlights: z.array(z.object({ title: z.string().min(1).max(32), text: z.string().min(1).max(100) })).min(2).max(6),
+  outcome: z.array(z.string().min(1).max(100)).min(1).max(3),
+});
 
 const projects = defineCollection({
   loader: glob({ pattern: '*/{ja,en}.md', base: './src/content/projects' }),
@@ -24,6 +57,7 @@ const projects = defineCollection({
       coverAlt: z.string().min(1),
       order: z.number().int(),
       draft: z.boolean().default(false),
+      deck: deck.optional(),
     }),
 });
 
