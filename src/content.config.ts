@@ -24,12 +24,8 @@ const flow = z
   })
   .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' });
 const story = z.object({
-  task: z.object({
-    text: z.string().min(1).max(200),
-    metric: z
-      .object({ before: z.string().min(1), after: z.string().min(1), unit: z.string().min(1), label: z.string().min(1), note: z.string().min(1).optional() })
-      .optional(),
-  }),
+  /** `**…**` marks the words shown in bold (the times saved). */
+  task: z.object({ text: z.string().min(1).max(220) }),
   before: flow.optional(),
   after: flow,
   architecture: z.object({ layers: z.array(card).min(1).max(4), leaves: z.array(card).min(1).max(4), note: z.string().min(1).max(140).optional() }),

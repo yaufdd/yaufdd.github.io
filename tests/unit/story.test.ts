@@ -18,7 +18,7 @@ interface Flow {
   note?: string;
 }
 interface Story {
-  task: { text: string; metric?: Record<string, string> };
+  task: { text: string };
   before?: Flow;
   after: Flow;
   architecture: { layers: Card[]; leaves: Card[]; note?: string };
@@ -42,8 +42,8 @@ const shape = (story: Story) => {
       note: Boolean(f.note),
     };
   return {
-    metric: story.task.metric && Object.keys(story.task.metric).sort(),
-    metricNumbers: story.task.metric && [story.task.metric.before, story.task.metric.after],
+    /** The **bold** bits (the times) carry the same numbers in both languages. */
+    bold: [...story.task.text.matchAll(/\*\*(.+?)\*\*/g)].map((m) => m[1]!.match(/[0-9.]+/g)),
     before: flow(story.before),
     after: flow(story.after),
     architecture: [story.architecture.layers.map((c) => c.icon), story.architecture.leaves.map((c) => c.icon), Boolean(story.architecture.note)],

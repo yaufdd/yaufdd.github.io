@@ -16,6 +16,8 @@ const { locale, entry, next } = Astro.props;
 const { data } = entry;
 const story = data.story!;
 const slug = slugOf(entry);
+// `**…**` in the problem text marks the bold bits: odd-numbered parts.
+const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
 ---
 {/* A case study told visually on one continuous page: short sections with cards, arrows and numbers. */}
 <div class="story">
@@ -29,24 +31,7 @@ const slug = slugOf(entry);
 
   <section id="story-task" aria-labelledby="story-task-title">
     <h2 id="story-task-title">{t(locale, 'story.task')}</h2>
-    <div class="task">
-      <p class="statement">{story.task.text}</p>
-      {
-        story.task.metric && (
-          <div class="metric">
-            <p class="numbers">
-              <span class="before">{story.task.metric.before}</span>
-              <small>{story.task.metric.unit}</small>
-              <span class="to" aria-hidden="true">→</span>
-              <span class="after">{story.task.metric.after}</span>
-              <small>{story.task.metric.unit}</small>
-            </p>
-            <p class="label">{story.task.metric.label}</p>
-            {story.task.metric.note && <p class="metric-note">{story.task.metric.note}</p>}
-          </div>
-        )
-      }
-    </div>
+    <p class="statement">{taskParts.map((part, i) => (i % 2 ? <strong>{part}</strong> : part))}</p>
   </section>
 
   {
@@ -184,66 +169,15 @@ const slug = slugOf(entry);
     margin: 12px 0 0;
   }
 
-  /* The problem */
-  .task {
-    display: grid;
-    gap: 40px;
-    align-items: center;
-  }
-  @media (min-width: 900px) {
-    .task {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
+  /* The problem: plain text, the times in bold. */
   .statement {
+    max-width: 46em;
     margin: 0;
-    font-size: clamp(18px, 2.2vw, 24px);
-    font-weight: 700;
-    line-height: 1.6;
+    font-size: 17px;
+    line-height: 1.9;
   }
-  .metric {
-    padding: 28px 32px;
-    border-radius: 18px;
-    background: var(--tag-bg);
-    color: var(--tag-fg);
-  }
-  .metric p {
-    margin: 0;
-  }
-  .numbers {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 10px;
-    font-weight: 900;
-    line-height: 1;
-  }
-  .numbers .before,
-  .numbers .after {
-    font-size: clamp(56px, 8vw, 96px);
-  }
-  .numbers .before {
-    color: #9a9a9a;
-    text-decoration: line-through;
-    text-decoration-thickness: 4px;
-  }
-  .numbers small {
-    font-size: 20px;
-    font-weight: 700;
-  }
-  .numbers .to {
-    margin: 0 6px;
-    font-size: 40px;
-  }
-  .label {
-    margin-top: 12px !important;
-    font-size: 15px;
-    font-weight: 700;
-  }
-  .metric-note {
-    margin-top: 6px !important;
-    color: #d6d6d6;
-    font-size: 14px;
+  .statement strong {
+    font-weight: 800;
   }
 
   /* Notes under the flows */

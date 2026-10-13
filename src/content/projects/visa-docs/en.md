@@ -13,8 +13,7 @@ coverAlt: "~/projects/visa-docs — terminal-style cover image"
 order: 1
 story:
   task:
-    text: "Visa paperwork was put together by hand from scans. With the system, the work per traveller went from an hour to 15 minutes."
-    metric: { before: "60", after: "15", unit: "min", label: "of work per traveller", note: "A 30-person tour: 30 hours → 7.5 hours" }
+    text: "Visa paperwork was put together by hand from scans, about **60 minutes** per traveller. With the system it takes **15 minutes**: a 30-person tour goes from **30 hours to 7.5 hours**."
   before:
     steps:
       - { icon: pen-line, title: "Traveller", note: "fills in a Word form by hand" }

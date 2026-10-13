@@ -18,12 +18,16 @@ for (const locale of ['ja', 'en'] as const) {
     await expect(page.locator('#story-cover h1')).toContainText(locale === 'ja' ? 'ビザ申請書類' : 'Visa Document Automation');
   });
 
-  test(`${locale}: the problem section shows the time saved per traveller`, async ({ page }) => {
+  test(`${locale}: the problem is plain text, with only the times in bold`, async ({ page }) => {
     await page.goto(url);
-    const metric = page.locator('#story-task .metric');
-    await expect(metric.locator('.before')).toHaveText('60');
-    await expect(metric.locator('.after')).toHaveText('15');
-    await expect(metric).toContainText(locale === 'ja' ? '30 人' : '30-person');
+    const task = page.locator('#story-task');
+    await expect(task.locator('.metric')).toHaveCount(0);
+    await expect(task.locator('p').first()).toHaveCSS('font-weight', '400');
+    const bold = await task.locator('strong').allTextContents();
+    expect(bold.length).toBeGreaterThanOrEqual(2);
+    expect(bold.join(' ')).toContain(locale === 'ja' ? '15 分' : '15 minutes');
+    for (const text of bold) expect(text, 'only times are bold').toMatch(locale === 'ja' ? /[0-9.]+ ?(分|時間)/ : /[0-9.]+ (minutes|hours)|an hour/);
+    await expect(task).toContainText(locale === 'ja' ? '30 人のツアー' : '30-person tour');
   });
 }
 
