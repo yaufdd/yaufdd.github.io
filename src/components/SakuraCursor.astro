@@ -14,6 +14,14 @@
   html.sakura-cursor * {
     cursor: none !important;
   }
+  /* A modal (the screenshot viewer) sits above the petals' canvas: there the normal arrow comes back. */
+  html.sakura-cursor:has(dialog[open]),
+  html.sakura-cursor:has(dialog[open]) * {
+    cursor: auto !important;
+  }
+  html.sakura-cursor:has(dialog[open]) dialog :is(button, a) {
+    cursor: pointer !important;
+  }
 </style>
 
 <style>

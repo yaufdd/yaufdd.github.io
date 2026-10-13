@@ -5,6 +5,7 @@ import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
 import Footer from '../components/Footer.astro';
 import Nav from '../components/Nav.astro';
+import SakuraCursor from '../components/SakuraCursor.astro';
 import defaultOgImage from '../assets/og-default.png';
 import { LOCALES, type Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
@@ -60,5 +61,6 @@ const ogImageUrl = new URL(og.src, site).href;
       <slot />
     </main>
     {!bare && <Footer locale={locale} />}
+    <SakuraCursor />
   </body>
 </html>

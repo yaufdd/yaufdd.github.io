@@ -41,13 +41,28 @@ test('the petals never get in the way of clicks', async ({ page }) => {
   await expect(page).toHaveURL(href!);
 });
 
-test('the case pages stay calm: no petals there', async ({ page }) => {
-  await page.goto('/projects/visa-docs/');
-  await expect(page.locator('[data-sakura]')).toHaveCount(0);
-  await expect(page.locator('body')).not.toHaveCSS('cursor', 'none');
+for (const url of ['/about/', '/en/', '/projects/visa-docs/', '/en/projects/pacxpuctanno/', '/404.html']) {
+  test(`petals and the hidden arrow on every page: ${url}`, async ({ page }) => {
+    await page.goto(url);
+    await expect(page.locator('[data-sakura]')).toHaveCount(1);
+    await expect(page.locator('body')).toHaveCSS('cursor', 'none');
+    await sweep(page);
+    await expect.poll(() => paintedPixels(page)).toBeGreaterThan(200);
+  });
+}
+
+test('in the screenshot viewer the arrow comes back, since the petals cannot show above it', async ({ page }) => {
+  await page.goto('/projects/pacxpuctanno/');
+  await page.locator('.prose img').first().click();
+  const dialog = page.locator('dialog.lightbox');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).not.toHaveCSS('cursor', 'none');
+  await expect(dialog.locator('button.close')).toHaveCSS('cursor', 'pointer');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('body')).toHaveCSS('cursor', 'none');
 });
 
-test('on the home page the arrow is hidden: the petals show where the pointer is', async ({ page }) => {
+test('the arrow is hidden everywhere on the page: the petals show where the pointer is', async ({ page }) => {
   await page.goto('/');
   for (const target of ['body', '.projects a', '.hello h1', '[data-avatar]']) {
     await expect(page.locator(target).first(), target).toHaveCSS('cursor', 'none');
