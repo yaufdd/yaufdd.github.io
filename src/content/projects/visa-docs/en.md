@@ -11,7 +11,7 @@ devProcess: Built with Claude Code in a spec → plan → TDD → review loop.
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — terminal-style cover image"
 order: 1
-deck:
+story:
   task:
     text: "Visa paperwork was put together by hand from scans. With the system, the work per traveller went from an hour to 15 minutes."
     metric: { before: "60", after: "15", unit: "min", label: "of work per traveller", note: "A 30-person tour: 30 hours → 7.5 hours" }

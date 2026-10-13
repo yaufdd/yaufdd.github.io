@@ -2,7 +2,7 @@
 import type { Project } from '../../lib/content';
 import Icon from './Icon.astro';
 
-type Flow = NonNullable<NonNullable<Project['data']['deck']>['before']>;
+type Flow = NonNullable<NonNullable<Project['data']['story']>['before']>;
 
 interface Props {
   flow: Flow;

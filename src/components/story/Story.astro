@@ -9,52 +9,40 @@ import Icon from './Icon.astro';
 interface Props {
   locale: Locale;
   entry: Project;
-  /** The project the last slide points to, if there is another one. */
+  /** The project the last section points to, if there is another one. */
   next?: Project;
 }
 const { locale, entry, next } = Astro.props;
 const { data } = entry;
-const deck = data.deck!;
+const story = data.story!;
 const slug = slugOf(entry);
-
-const slides = [
-  { id: 'cover', label: data.title },
-  { id: 'task', label: t(locale, 'deck.task') },
-  ...(deck.before ? [{ id: 'before', label: t(locale, 'deck.before') }] : []),
-  { id: 'after', label: t(locale, 'deck.after') },
-  { id: 'architecture', label: t(locale, 'deck.architecture') },
-  { id: 'highlights', label: t(locale, 'deck.highlights') },
-  { id: 'outcome', label: t(locale, 'deck.outcome') },
-];
-const number = (id: string) => String(slides.findIndex((s) => s.id === id) + 1).padStart(2, '0');
 ---
-{/* A case study told as slides: one idea per screen on a computer, a plain column on a phone. */}
-<div class="deck">
-  <section class="slide cover" id="slide-cover" aria-labelledby="deck-title">
+{/* A case study told visually on one continuous page: short sections with cards, arrows and numbers. */}
+<div class="story">
+  <section class="cover" id="story-cover" aria-labelledby="story-title">
     <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>
     <p class="crumb">~/projects/{slug}</p>
-    <h1 id="deck-title" class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
+    <h1 id="story-title" class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
     <p class="lead">{data.summary}</p>
     <CaseMeta locale={locale} data={data} />
   </section>
 
-  <section class="slide" id="slide-task" aria-labelledby="slide-task-title">
-    <p class="index mono">{number('task')}</p>
-    <h2 id="slide-task-title">{t(locale, 'deck.task')}</h2>
+  <section id="story-task" aria-labelledby="story-task-title">
+    <h2 id="story-task-title">{t(locale, 'story.task')}</h2>
     <div class="task">
-      <p class="statement" data-reveal style="--i: 1">{deck.task.text}</p>
+      <p class="statement" data-reveal style="--i: 1">{story.task.text}</p>
       {
-        deck.task.metric && (
+        story.task.metric && (
           <div class="metric" data-reveal style="--i: 4">
             <p class="numbers">
-              <span class="before">{deck.task.metric.before}</span>
-              <small>{deck.task.metric.unit}</small>
+              <span class="before">{story.task.metric.before}</span>
+              <small>{story.task.metric.unit}</small>
               <span class="to" aria-hidden="true">→</span>
-              <span class="after">{deck.task.metric.after}</span>
-              <small>{deck.task.metric.unit}</small>
+              <span class="after">{story.task.metric.after}</span>
+              <small>{story.task.metric.unit}</small>
             </p>
-            <p class="label">{deck.task.metric.label}</p>
-            {deck.task.metric.note && <p class="metric-note">{deck.task.metric.note}</p>}
+            <p class="label">{story.task.metric.label}</p>
+            {story.task.metric.note && <p class="metric-note">{story.task.metric.note}</p>}
           </div>
         )
       }
@@ -62,35 +50,32 @@ const number = (id: string) => String(slides.findIndex((s) => s.id === id) + 1).
   </section>
 
   {
-    deck.before && (
-      <section class="slide" id="slide-before" aria-labelledby="slide-before-title">
-        <p class="index mono">{number('before')}</p>
-        <h2 id="slide-before-title">{t(locale, 'deck.before')}</h2>
-        <Flow flow={deck.before} />
-        {deck.before.note && (
+    story.before && (
+      <section id="story-before" aria-labelledby="story-before-title">
+        <h2 id="story-before-title">{t(locale, 'story.before')}</h2>
+        <Flow flow={story.before} />
+        {story.before.note && (
           <p class="note pain" data-reveal style="--i: 9">
             <Icon name="triangle-alert" />
-            {deck.before.note}
+            {story.before.note}
           </p>
         )}
       </section>
     )
   }
 
-  <section class="slide" id="slide-after" aria-labelledby="slide-after-title">
-    <p class="index mono">{number('after')}</p>
-    <h2 id="slide-after-title">{t(locale, 'deck.after')}</h2>
-    <Flow flow={deck.after} />
-    {deck.after.note && <p class="note" data-reveal style="--i: 10">{deck.after.note}</p>}
+  <section id="story-after" aria-labelledby="story-after-title">
+    <h2 id="story-after-title">{t(locale, 'story.after')}</h2>
+    <Flow flow={story.after} />
+    {story.after.note && <p class="note" data-reveal style="--i: 10">{story.after.note}</p>}
   </section>
 
-  <section class="slide" id="slide-architecture" aria-labelledby="slide-architecture-title">
-    <p class="index mono">{number('architecture')}</p>
-    <h2 id="slide-architecture-title">{t(locale, 'deck.architecture')}</h2>
+  <section id="story-architecture" aria-labelledby="story-architecture-title">
+    <h2 id="story-architecture-title">{t(locale, 'story.architecture')}</h2>
     <div class="arch">
       <ol class="layers">
         {
-          deck.architecture.layers.map((layer, i) => (
+          story.architecture.layers.map((layer, i) => (
             <li data-reveal style={`--i: ${i + 1}`}>
               <Icon name={layer.icon} />
               <b>{layer.title}</b>
@@ -99,10 +84,10 @@ const number = (id: string) => String(slides.findIndex((s) => s.id === id) + 1).
           ))
         }
       </ol>
-      <ul class="leaves" style={`--n: ${deck.architecture.leaves.length}`}>
+      <ul class="leaves" style={`--n: ${story.architecture.leaves.length}`}>
         {
-          deck.architecture.leaves.map((leaf, i) => (
-            <li data-reveal style={`--i: ${deck.architecture.layers.length + i + 1}`}>
+          story.architecture.leaves.map((leaf, i) => (
+            <li data-reveal style={`--i: ${story.architecture.layers.length + i + 1}`}>
               <Icon name={leaf.icon} />
               <b>{leaf.title}</b>
               {leaf.note && <span>{leaf.note}</span>}
@@ -111,15 +96,14 @@ const number = (id: string) => String(slides.findIndex((s) => s.id === id) + 1).
         }
       </ul>
     </div>
-    {deck.architecture.note && <p class="note" data-reveal style="--i: 9">{deck.architecture.note}</p>}
+    {story.architecture.note && <p class="note" data-reveal style="--i: 9">{story.architecture.note}</p>}
   </section>
 
-  <section class="slide" id="slide-highlights" aria-labelledby="slide-highlights-title">
-    <p class="index mono">{number('highlights')}</p>
-    <h2 id="slide-highlights-title">{t(locale, 'deck.highlights')}</h2>
+  <section id="story-highlights" aria-labelledby="story-highlights-title">
+    <h2 id="story-highlights-title">{t(locale, 'story.highlights')}</h2>
     <ul class="highlights">
       {
-        deck.highlights.map((h, i) => (
+        story.highlights.map((h, i) => (
           <li data-reveal style={`--i: ${i + 1}`}>
             <b>{h.title}</b>
             <span>{h.text}</span>
@@ -129,92 +113,54 @@ const number = (id: string) => String(slides.findIndex((s) => s.id === id) + 1).
     </ul>
   </section>
 
-  <section class="slide" id="slide-outcome" aria-labelledby="slide-outcome-title">
-    <p class="index mono">{number('outcome')}</p>
-    <h2 id="slide-outcome-title">{t(locale, 'deck.outcome')}</h2>
+  <section id="story-outcome" aria-labelledby="story-outcome-title">
+    <h2 id="story-outcome-title">{t(locale, 'story.outcome')}</h2>
     <ul class="outcome">
-      {deck.outcome.map((line, i) => <li data-reveal style={`--i: ${i + 1}`}>{line}</li>)}
+      {story.outcome.map((line, i) => <li data-reveal style={`--i: ${i + 1}`}>{line}</li>)}
     </ul>
     <p class="links">
-      {next && <a class="next" href={localizePath(locale, `projects/${slugOf(next)}/`)}>{t(locale, 'deck.nextProject')}: {next.data.title} →</a>}
-      <a href={localizePath(locale, '')}>{t(locale, 'deck.home')}</a>
+      {next && <a class="next" href={localizePath(locale, `projects/${slugOf(next)}/`)}>{t(locale, 'story.nextProject')}: {next.data.title} →</a>}
+      <a href={localizePath(locale, '')}>{t(locale, 'story.home')}</a>
     </p>
   </section>
 
   <details class="more">
-    <summary>{t(locale, 'deck.readMore')}</summary>
+    <summary>{t(locale, 'story.readMore')}</summary>
     <div class="prose"><slot /></div>
   </details>
 </div>
 
-<nav class="deck-dots" aria-label={t(locale, 'deck.slides')}>
-  {slides.map((s, i) => <a href={`#slide-${s.id}`} aria-label={s.label} aria-current={i === 0 ? 'true' : undefined} />)}
-</nav>
-
 <script>
-  import { startDeck } from '../../lib/deck';
   import { startMotion } from '../../lib/motion';
 
-  const deck = document.querySelector<HTMLElement>('.deck');
-  if (deck) startDeck(deck);
   startMotion();
 </script>
 
-<style is:global>
-  /* Slides snap gently into place on a computer; never on a phone. */
-  @media (min-width: 1100px) and (min-height: 700px) and (hover: hover) {
-    html:has(.deck) {
-      scroll-snap-type: y proximity;
-    }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    html:has(.deck) {
-      scroll-behavior: smooth;
-    }
-  }
-</style>
-
 <style>
-  .deck {
+  .story {
     max-width: 1080px;
     margin: 0 auto;
     padding: 0 20px 48px;
   }
-  .slide {
+  .story > section {
     display: grid;
-    align-content: center;
-    gap: 28px;
-    padding: 48px 0;
+    gap: 24px;
+    padding: 56px 0;
   }
-  @media (min-width: 1100px) and (min-height: 700px) {
-    .slide {
-      box-sizing: border-box;
-      height: 100dvh;
-      padding: 56px 0;
-      overflow: hidden;
-      scroll-snap-align: start;
-    }
-    /* The cover sits under the site header: snapping to it would scroll the header away on opening. */
-    .cover {
-      scroll-snap-align: none;
-    }
-  }
-  .index {
-    margin: 0 0 -20px;
-    color: var(--muted);
-    font-size: 13px;
+  .story > section + section {
+    border-top: 1px solid var(--border);
   }
   h2 {
     margin: 0;
-    font-size: clamp(34px, 5vw, 56px);
+    font-size: clamp(26px, 3.2vw, 36px);
     font-weight: 900;
-    line-height: 1.05;
+    line-height: 1.1;
   }
 
   /* Cover */
-  .cover {
-    align-content: start;
+  .story > .cover {
     gap: 14px;
+    padding-top: 24px;
   }
   .back {
     color: var(--muted);
@@ -498,31 +444,5 @@ const number = (id: string) => String(slides.findIndex((s) => s.id === id) + 1).
   .more summary {
     cursor: pointer;
     font-weight: 800;
-  }
-
-  /* Slide dots */
-  .deck-dots {
-    position: fixed;
-    top: 50%;
-    right: 20px;
-    z-index: 10;
-    display: none;
-    gap: 12px;
-    transform: translateY(-50%);
-  }
-  @media (min-width: 1100px) and (min-height: 700px) {
-    .deck-dots {
-      display: grid;
-    }
-  }
-  .deck-dots a {
-    width: 10px;
-    height: 10px;
-    border: 2px solid var(--fg);
-    border-radius: 50%;
-    transition: background 0.2s;
-  }
-  .deck-dots a[aria-current='true'] {
-    background: var(--fg);
   }
 </style>

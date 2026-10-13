@@ -1,5 +1,5 @@
 /**
- * Icons for the case-study slides: the inner SVG markup of Lucide icons (lucide-static v1.56.0), drawn on a
+ * Icons for the visual case studies (src/components/story/): the inner SVG markup of Lucide icons (lucide-static v1.56.0), drawn on a
  * 24×24 grid with stroke="currentColor". Lucide is ISC-licensed:
  *
  *   ISC License — Copyright (c) 2026 Lucide Icons and Contributors

@@ -2,7 +2,7 @@
 import '../styles/prose.css';
 import { render } from 'astro:content';
 import CaseMeta from '../components/CaseMeta.astro';
-import Deck from '../components/deck/Deck.astro';
+import Story from '../components/story/Story.astro';
 import Lightbox from '../components/Lightbox.astro';
 import type { Locale } from '../i18n/ui';
 import { localizePath, t } from '../i18n/utils';
@@ -17,17 +17,17 @@ const { locale, entry } = Astro.props;
 const { data } = entry;
 const slug = slugOf(entry);
 const { Content } = await render(entry);
-// The project the last slide points to: the next one in the home page order, wrapping around.
+// The project the story's last section points to: the next one in the home page order, wrapping around.
 const projects = await getProjects(locale);
 const at = projects.findIndex((p) => slugOf(p) === slug);
 const next = projects.length > 1 ? projects[(at + 1) % projects.length] : undefined;
 ---
 <Base locale={locale} path={`projects/${slug}/`} title={data.title} description={data.summary} ogImage={data.cover}>
   {
-    data.deck ? (
-      <Deck locale={locale} entry={entry} next={next}>
+    data.story ? (
+      <Story locale={locale} entry={entry} next={next}>
         <Content />
-      </Deck>
+      </Story>
     ) : (
       <article class="container case">
         <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>

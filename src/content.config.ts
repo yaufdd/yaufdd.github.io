@@ -1,13 +1,13 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { ICON_NAMES } from './components/deck/icons';
+import { ICON_NAMES } from './components/story/icons';
 
 const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Use the YYYY-MM format, e.g. "2026-04"');
 
 /*
- * Slides for a case study told as a presentation (src/components/deck/). Texts are capped: a slide shows one idea
- * in a few words, and the full story stays in the Markdown body under "Read more".
+ * A case study told visually (src/components/story/): short sections with cards, arrows and numbers. Texts are
+ * capped so each section says one thing in a few words; the full text stays in the Markdown body under "Read more".
  */
 const card = z.object({
   icon: z.enum(ICON_NAMES),
@@ -23,7 +23,7 @@ const flow = z
     note: z.string().min(1).max(140).optional(),
   })
   .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' });
-const deck = z.object({
+const story = z.object({
   task: z.object({
     text: z.string().min(1).max(200),
     metric: z
@@ -57,7 +57,7 @@ const projects = defineCollection({
       coverAlt: z.string().min(1),
       order: z.number().int(),
       draft: z.boolean().default(false),
-      deck: deck.optional(),
+      story: story.optional(),
     }),
 });
 

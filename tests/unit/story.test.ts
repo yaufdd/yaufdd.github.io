@@ -17,7 +17,7 @@ interface Flow {
   result?: Card;
   note?: string;
 }
-interface Deck {
+interface Story {
   task: { text: string; metric?: Record<string, string> };
   before?: Flow;
   after: Flow;
@@ -27,14 +27,14 @@ interface Deck {
 }
 
 const frontmatter = (slug: string, locale: 'ja' | 'en') =>
-  parse(readFileSync(join(ROOT, slug, `${locale}.md`), 'utf8').split(/\r?\n---/)[0]!.replace(/^---/, '')) as { deck?: Deck };
+  parse(readFileSync(join(ROOT, slug, `${locale}.md`), 'utf8').split(/\r?\n---/)[0]!.replace(/^---/, '')) as { story?: Story };
 
 const slugs = readdirSync(ROOT, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map((d) => d.name);
 
-/** Everything about a deck except its wording: the two languages must tell the same story with the same pictures. */
-const shape = (deck: Deck) => {
+/** Everything about a story except its wording: the two languages must tell the same story with the same pictures. */
+const shape = (story: Story) => {
   const flow = (f?: Flow) =>
     f && {
       steps: f.steps.map((s) => [s.icon, s.link ?? 'next']),
@@ -42,28 +42,28 @@ const shape = (deck: Deck) => {
       note: Boolean(f.note),
     };
   return {
-    metric: deck.task.metric && Object.keys(deck.task.metric).sort(),
-    metricNumbers: deck.task.metric && [deck.task.metric.before, deck.task.metric.after],
-    before: flow(deck.before),
-    after: flow(deck.after),
-    architecture: [deck.architecture.layers.map((c) => c.icon), deck.architecture.leaves.map((c) => c.icon), Boolean(deck.architecture.note)],
-    highlights: deck.highlights.length,
-    outcome: deck.outcome.length,
+    metric: story.task.metric && Object.keys(story.task.metric).sort(),
+    metricNumbers: story.task.metric && [story.task.metric.before, story.task.metric.after],
+    before: flow(story.before),
+    after: flow(story.after),
+    architecture: [story.architecture.layers.map((c) => c.icon), story.architecture.leaves.map((c) => c.icon), Boolean(story.architecture.note)],
+    highlights: story.highlights.length,
+    outcome: story.outcome.length,
   };
 };
 
-it('the visa case is told as slides', () => {
-  expect(frontmatter('visa-docs', 'ja').deck).toBeDefined();
+it('the visa case is told as a visual story', () => {
+  expect(frontmatter('visa-docs', 'ja').story).toBeDefined();
 });
 
 describe.each(slugs)('project %s', (slug) => {
-  it('has slides in both languages or in neither', () => {
-    expect(Boolean(frontmatter(slug, 'en').deck)).toBe(Boolean(frontmatter(slug, 'ja').deck));
+  it('has a story in both languages or in neither', () => {
+    expect(Boolean(frontmatter(slug, 'en').story)).toBe(Boolean(frontmatter(slug, 'ja').story));
   });
 
   it('tells the same story in ja and en: same steps, icons, arrows and numbers', () => {
-    const ja = frontmatter(slug, 'ja').deck;
-    const en = frontmatter(slug, 'en').deck;
+    const ja = frontmatter(slug, 'ja').story;
+    const en = frontmatter(slug, 'en').story;
     if (!ja || !en) return;
     expect(shape(en)).toEqual(shape(ja));
   });

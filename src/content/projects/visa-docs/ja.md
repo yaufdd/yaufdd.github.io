@@ -11,7 +11,7 @@ devProcess: Claude Code で「仕様 → 実装計画 → TDD → レビュー�
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — ターミナル風のカバー画像"
 order: 1
-deck:
+story:
   task:
     text: "ビザ申請の書類は、担当者がスキャンを見ながら手で作っていました。システムで、1 人あたりの作業が 1 時間から 15 分になりました。"
     metric: { before: "60", after: "15", unit: "分", label: "1 人あたりの作業時間", note: "30 人のツアーなら 30 時間 → 7.5 時間" }
