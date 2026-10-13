@@ -1,0 +1,20 @@
+{/* Sakura petals falling from the mouse pointer (src/lib/sakura.ts); never on touch screens or with reduced motion. */}
+<canvas class="sakura" data-sakura aria-hidden="true"></canvas>
+
+<script>
+  import { startSakura } from '../lib/sakura';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-sakura]');
+  if (canvas) startSakura(canvas);
+</script>
+
+<style>
+  .sakura {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>
