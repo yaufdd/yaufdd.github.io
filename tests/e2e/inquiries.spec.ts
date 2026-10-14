@@ -14,14 +14,14 @@ for (const locale of ['ja', 'en'] as const) {
       'story-highlights',
       'story-outcome',
     ]);
-    // Screens right under the summary: the admin home, a request, and the Telegram bot.
+    // Screens right under the summary: the admin home and a request (no Telegram screenshot).
     const shots = page.locator('#story-cover figure.screens img');
-    await expect(shots).toHaveCount(3);
+    await expect(shots).toHaveCount(2);
     expect(await shots.evaluateAll((els) => els.map((e) => (e as HTMLImageElement).currentSrc || (e as HTMLImageElement).src))).toEqual([
       expect.stringContaining('hub-home'),
       expect.stringContaining('hub-request'),
-      expect.stringContaining('hub-bot'),
     ]);
+    await expect(page.locator('img[src*="hub-bot"]')).toHaveCount(0);
     await expect(page.locator('#story-cover figure.screens .mock-note')).toBeVisible();
     await expect(page.locator('#story-highlights li')).toHaveCount(3);
     await expect(page.locator('#story-outcome [data-avatar]')).toHaveCount(1);
@@ -41,14 +41,3 @@ for (const locale of ['ja', 'en'] as const) {
   });
 }
 
-test('a portrait phone screen stands beside the two wide screens, which are stacked', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/projects/inquiry-hub/');
-  const [home, request, bot] = await Promise.all(
-    ['hub-home', 'hub-request', 'hub-bot'].map(async (n) => (await page.locator(`#story-cover figure.screens img[src*="${n}"]`).boundingBox())!),
-  );
-  expect(request!.y, 'request under home').toBeGreaterThan(home!.y + home!.height - 1);
-  expect(Math.abs(request!.x - home!.x)).toBeLessThanOrEqual(1);
-  expect(bot!.x, 'bot to the right').toBeGreaterThan(home!.x + home!.width);
-  expect(home!.width, 'wide screens stay readable').toBeGreaterThan(450);
-});

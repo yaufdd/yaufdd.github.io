@@ -33,7 +33,6 @@ story:
     items:
       - { image: "./images/hub-home.png", alt: "管理画面のホーム：問い合わせの一覧・新規作成・カテゴリ" }
       - { image: "./images/hub-request.png", alt: "問い合わせの画面：顧客・担当者・ステータスと、変更の履歴（ダミーデータ）" }
-      - { image: "./images/hub-bot.png", alt: "Telegram ボット：転送したメッセージから問い合わせを作成（ダミーデータ）" }
   architecture:
     layers:
       - { icon: globe, title: "ブラウザ・Mini App", note: "React SPA" }

@@ -33,7 +33,6 @@ story:
     items:
       - { image: "./images/hub-home.png", alt: "Admin home: all requests, new request and categories" }
       - { image: "./images/hub-request.png", alt: "A request: client, manager and status, with its history of changes (mock data)" }
-      - { image: "./images/hub-bot.png", alt: "The Telegram bot: creating a request from a forwarded message (mock data)" }
   architecture:
     layers:
       - { icon: globe, title: "Browser · Mini App", note: "React SPA" }
