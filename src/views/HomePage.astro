@@ -14,14 +14,12 @@ interface Props {
 }
 const { locale } = Astro.props;
 const projects = await getProjects(locale);
-// The travel company's systems show as one entry; personal projects and the workflow are listed one by one.
+// The travel company's systems show as one entry; then the personal projects under their own label; then the workflow.
 const travel = projects.filter((p) => p.data.group === 'travel');
-const links = [
-  ...projects
-    .filter((p) => p.data.group !== 'travel')
-    .map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title, tagline: p.data.tagline })),
-  { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'home.workflowLink'), tagline: t(locale, 'home.workflowTagline') },
-];
+const personal = projects
+  .filter((p) => p.data.group !== 'travel')
+  .map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title, tagline: p.data.tagline }));
+const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'home.workflowLink'), tagline: t(locale, 'home.workflowTagline') };
 ---
 <Base locale={locale} path="" description={t(locale, 'home.bio')} bare>
   <div class="sheet">
@@ -40,7 +38,7 @@ const links = [
       <ul>
         {
           travel.length > 0 && (
-            <li class="group">
+            <li class="group travel">
               <b>{t(locale, 'home.travelProjects')}</b>
               <span>{t(locale, 'home.travelCount', { n: travel.length })}</span>
               <a href={localizePath(locale, 'projects/#travel')}>{t(locale, 'home.seeDetails')}</a>
@@ -48,15 +46,28 @@ const links = [
           )
         }
         {
-          links.map((link) => (
-            <li>
-              <a href={link.href}>
-                <b>{link.label} →</b>
-                <span>{link.tagline}</span>
-              </a>
+          personal.length > 0 && (
+            <li class="group personal">
+              <b>{t(locale, 'projects.personal')}</b>
+              <ul>
+                {personal.map((link) => (
+                  <li>
+                    <a href={link.href}>
+                      <b>{link.label} →</b>
+                      <span>{link.tagline}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </li>
-          ))
+          )
         }
+        <li>
+          <a href={workflow.href}>
+            <b>{workflow.label} →</b>
+            <span>{workflow.tagline}</span>
+          </a>
+        </li>
       </ul>
       <a class="all" href={localizePath(locale, 'projects/')}>{t(locale, 'home.allProjects')}</a>
     </section>
@@ -222,11 +233,19 @@ const links = [
     justify-items: start;
     gap: 2px;
   }
-  .projects .group b {
+  .projects .group > b {
     padding-bottom: 0;
     border-bottom: 0;
   }
-  .projects .group a {
+  /* The personal projects sit under their label, like the travel company's entry. */
+  .projects .personal ul {
+    display: grid;
+    gap: 8px;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .projects .travel > a {
     display: inline;
     font-size: 12.5px;
     font-weight: 700;

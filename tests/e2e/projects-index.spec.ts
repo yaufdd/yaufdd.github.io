@@ -35,7 +35,7 @@ for (const locale of ['ja', 'en'] as const) {
 
   test(`${locale}: "see details" on the home page lands on the travel company's part`, async ({ page }) => {
     await page.goto(prefix);
-    await page.locator('.projects li.group a').click();
+    await page.locator('.projects li.group.travel a').click();
     await expect(page).toHaveURL(`${prefix}projects/#travel`);
     await expect(page.locator('#travel')).toBeInViewport();
   });

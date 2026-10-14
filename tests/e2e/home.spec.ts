@@ -146,10 +146,21 @@ for (const locale of ['ja', 'en'] as const) {
     await open(page, home);
     const expected = expectedProjectLinks(locale);
     expect(await page.locator('.projects a').evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual(expected);
-    const travel = page.locator('.projects li.group');
+    const travel = page.locator('.projects li.group.travel');
     await expect(travel.locator('b')).toHaveText(locale === 'ja' ? '旅行会社のプロジェクト' : 'Projects at a travel company');
     await expect(travel.locator('span')).toHaveText(locale === 'ja' ? '社内システム 3 件' : '3 internal systems');
     await expect(travel.locator('a')).toHaveText(locale === 'ja' ? '詳しく見る →' : 'See details →');
+    // Then the personal projects, under their own label.
+    const personal = page.locator('.projects li.group.personal');
+    await expect(personal.locator(':scope > b')).toHaveText(locale === 'ja' ? '個人プロジェクト' : 'Personal projects');
+    expect(await personal.locator('a').evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual([`${locale === 'ja' ? '/' : '/en/'}projects/pacxpuctanno/`]);
+    // Each personal project reads like the other entries: its title, and the one-line description under it.
+    const title = (await personal.locator('a b').first().boundingBox())!;
+    const line = (await personal.locator('a span').first().boundingBox())!;
+    expect(line.y, 'description under the title').toBeGreaterThanOrEqual(title.y + title.height - 1);
+    await expect(personal.locator('a').first()).toHaveCSS('text-decoration-line', 'none');
+    const travelBox = (await travel.boundingBox())!;
+    expect((await personal.boundingBox())!.y, 'personal projects come after the travel company').toBeGreaterThan(travelBox.y + travelBox.height - 1);
     const button = page.locator('.projects a.all');
     await expect(button).toHaveText(locale === 'ja' ? 'すべてのプロジェクトを見る' : 'See all projects');
     await button.click();
