@@ -13,7 +13,7 @@ coverAlt: "~/projects/visa-docs — terminal-style cover image"
 order: 1
 story:
   task:
-    text: "Visa paperwork was put together by hand from scans, about **60 minutes** per traveller. With the system it takes **15 minutes**: a 30-person tour goes from **30 hours to 7.5 hours**."
+    text: "Visa paperwork was made by hand from scans: about **60 minutes** per traveller. Now it takes **15 minutes**, and even a 30-person tour gets all its documents at once, as soon as everyone has filled in the form."
     documents:
       title: "Documents for one traveller, for example"
       items:

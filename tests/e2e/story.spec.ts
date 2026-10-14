@@ -30,6 +30,9 @@ for (const locale of ['ja', 'en'] as const) {
     expect(bold.join(' ')).toContain(locale === 'ja' ? '15 分' : '15 minutes');
     for (const text of bold) expect(text, 'only times are bold').toMatch(locale === 'ja' ? /[0-9.]+ ?(分|時間)/ : /[0-9.]+ (minutes|hours)|an hour/);
     await expect(task).toContainText(locale === 'ja' ? '30 人のツアー' : '30-person tour');
+    // A tour is not 30 × 15 minutes: once everyone has filled in the form, the whole tour's documents come out at once.
+    await expect(task.locator('.statement')).toContainText(locale === 'ja' ? 'まとめて生成' : 'at once');
+    await expect(task.locator('.statement')).not.toContainText('7.5');
   });
 }
 
