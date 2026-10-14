@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Avatar3D from '../Avatar3D.astro';
 import CaseMeta from '../CaseMeta.astro';
 import type { Locale } from '../../i18n/ui';
 import { localizePath, t } from '../../i18n/utils';
@@ -130,13 +131,18 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
 
   <section id="story-outcome" aria-labelledby="story-outcome-title">
     <h2 id="story-outcome-title">{t(locale, 'story.outcome')}</h2>
-    <ul class="outcome">
-      {story.outcome.map((line) => <li>{line}</li>)}
-    </ul>
-    <p class="links">
-      {next && <a class="next" href={localizePath(locale, `projects/${slugOf(next)}/`)}>{t(locale, 'story.nextProject')}: {next.data.title} →</a>}
-      <a href={localizePath(locale, '')}>{t(locale, 'story.home')}</a>
-    </p>
+    <div class="outcome-row">
+      <div>
+        <div class="outcome">
+          {story.outcome.map((line) => <p>{line}</p>)}
+        </div>
+        <p class="links">
+          {next && <a class="next" href={localizePath(locale, `projects/${slugOf(next)}/`)}>{t(locale, 'story.nextProject')}: {next.data.title} →</a>}
+          <a href={localizePath(locale, '')}>{t(locale, 'story.home')}</a>
+        </p>
+      </div>
+      <div class="figure"><Avatar3D label={t(locale, 'home.avatarAlt')} /></div>
+    </div>
   </section>
 
   <details class="more">
@@ -445,19 +451,36 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     line-height: 1.6;
   }
 
-  /* What's next */
+  /* Outcome: where things stand now, with the 3D figure beside it (under it on a phone). */
+  .outcome-row {
+    display: grid;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .outcome-row {
+      grid-template-columns: minmax(0, 1fr) 180px;
+      gap: 56px;
+    }
+  }
   .outcome {
     display: grid;
-    gap: 14px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: clamp(18px, 2vw, 22px);
-    font-weight: 700;
+    gap: 10px;
+    max-width: 40em;
+    font-size: 17px;
+    line-height: 1.8;
   }
-  .outcome li::before {
-    margin-right: 10px;
-    content: '→' / '';
+  .outcome p {
+    margin: 0;
+  }
+  .figure {
+    width: 160px;
+    justify-self: center;
+  }
+  @media (min-width: 900px) {
+    .figure {
+      width: 180px;
+    }
   }
   .links {
     display: flex;

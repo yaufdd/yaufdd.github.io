@@ -2,8 +2,8 @@ import { expect, test } from './fixtures';
 
 const SECTIONS = ['cover', 'task', 'change', 'architecture', 'highlights', 'outcome'];
 const HEADINGS = {
-  ja: { task: '課題', change: '以前と現在', architecture: 'アーキテクチャ', highlights: '技術的な工夫', outcome: '振り返りと次の一手' },
-  en: { task: 'The problem', change: 'Before and now', architecture: 'Architecture', highlights: 'Technical highlights', outcome: 'What’s next' },
+  ja: { task: '課題', change: '以前と現在', architecture: 'アーキテクチャ', highlights: '技術的な工夫', outcome: 'まとめ' },
+  en: { task: 'The problem', change: 'Before and now', architecture: 'Architecture', highlights: 'Technical highlights', outcome: 'Outcome' },
 } as const;
 const ROWS = { ja: ['以前', '現在'], en: ['Before', 'Now'] } as const;
 
@@ -131,6 +131,30 @@ test('highlights are short cards and the last section links to the next project 
   await expect(cards.nth(2)).toContainText('プロンプト');
   await expect(page.locator('#story-outcome a[href="/projects/pacxpuctanno/"]')).toBeVisible();
   await expect(page.locator('#story-outcome a[href="/"]')).toBeVisible();
+});
+
+test('the outcome is where things stand now, with the 3D figure beside it', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/projects/visa-docs/');
+  const outcome = page.locator('#story-outcome');
+  const text = outcome.locator('.outcome');
+  await expect(text).toContainText('毎日の業務');
+  await expect(text).toContainText('ツアーそのもの');
+  await expect(text).toContainText('ビザ');
+  await expect(text).not.toContainText('ジョブキュー');
+  const figure = outcome.locator('[data-avatar]');
+  await expect(figure).toBeVisible();
+  const t = (await text.boundingBox())!;
+  const a = (await figure.boundingBox())!;
+  expect(a.x, 'beside the text').toBeGreaterThan(t.x + t.width);
+});
+
+test('on a phone the 3D figure of the outcome sits under the text', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto('/projects/visa-docs/');
+  const t = (await page.locator('#story-outcome .outcome').boundingBox())!;
+  const a = (await page.locator('#story-outcome [data-avatar]').boundingBox())!;
+  expect(a.y).toBeGreaterThan(t.y + t.height);
 });
 
 test('it is one continuous page: no snapping, no slide dots, sections only as tall as their content', async ({ page }) => {

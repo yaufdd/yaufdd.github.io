@@ -54,8 +54,9 @@ story:
     - { title: "Failures handled on purpose", text: "A failed translation stops generation; a failed declension only warns." }
     - { title: "Personal data stays at home", text: "Personal data may not leave the country, so Claude and ChatGPT were out: I used YandexGPT and made up for the weaker model with prompting." }
   outcome:
-    - "Next: move document generation to a job queue."
-    - "As it grows, pull a service layer out of the handlers."
+    - "Today the system is part of everyday work."
+    - "Freed from the paperwork, the staff have more time for the tours themselves."
+    - "A visa is not part of the tour, but without it the trip never starts, which is why this matters."
 ---
 
 ## Problem
