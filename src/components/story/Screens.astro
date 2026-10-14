@@ -11,11 +11,19 @@ interface Props {
   screens: Screens;
 }
 const { locale, screens } = Astro.props;
+// A tall phone screen next to wide desktop screens: the wide ones stack on the left, the phone stands beside them.
+const isPortrait = (shot: Screens['items'][number]) => shot.image.height > shot.image.width;
+const wide = screens.items.filter((shot) => !isPortrait(shot)).length;
+const mixed = wide > 0 && wide < screens.items.length;
 ---
 {/* Example screens: no heading, just the pictures (click to enlarge in the screenshot viewer) and one caption. */}
 <figure class:list={['screens', screens.at]} data-lightbox>
-  <div class="shots">
-    {screens.items.map((shot) => <Image src={shot.image} alt={shot.alt} widths={[480, 960, 1600]} sizes="(min-width: 1100px) 520px, 100vw" />)}
+  <div class:list={['shots', { mixed }]} style={mixed ? `--rows: ${wide}` : undefined}>
+    {
+      screens.items.map((shot) => (
+        <Image src={shot.image} alt={shot.alt} class:list={{ portrait: isPortrait(shot) }} widths={[480, 960, 1600]} sizes="(min-width: 1100px) 560px, 100vw" />
+      ))
+    }
   </div>
   <figcaption>
     <span class="caption">{screens.caption}</span>
@@ -37,6 +45,19 @@ const { locale, screens } = Astro.props;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+  }
+  @media (min-width: 900px) {
+    .shots.mixed {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+      align-items: start;
+    }
+    .shots.mixed :global(img:not(.portrait)) {
+      grid-column: 1;
+    }
+    .shots.mixed :global(img.portrait) {
+      grid-column: 2;
+      grid-row: 1 / span var(--rows);
+    }
   }
   .shots :global(img) {
     display: block;
