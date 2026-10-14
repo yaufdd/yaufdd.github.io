@@ -1,20 +1,26 @@
 ---
 import { Image } from 'astro:assets';
+import type { Locale } from '../../i18n/ui';
+import { t } from '../../i18n/utils';
 import type { Project } from '../../lib/content';
 
 type Screens = NonNullable<NonNullable<Project['data']['story']>['screens']>;
 
 interface Props {
+  locale: Locale;
   screens: Screens;
 }
-const { screens } = Astro.props;
+const { locale, screens } = Astro.props;
 ---
 {/* Example screens: no heading, just the pictures (click to enlarge in the screenshot viewer) and one caption. */}
 <figure class:list={['screens', screens.at]} data-lightbox>
   <div class="shots">
     {screens.items.map((shot) => <Image src={shot.image} alt={shot.alt} widths={[480, 960, 1600]} sizes="(min-width: 1100px) 520px, 100vw" />)}
   </div>
-  <figcaption>{screens.caption}</figcaption>
+  <figcaption>
+    <span class="caption">{screens.caption}</span>
+    <span class="mock-note">{t(locale, 'story.mockNote')}</span>
+  </figcaption>
 </figure>
 
 <style>
@@ -41,8 +47,13 @@ const { screens } = Astro.props;
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 10px 24px rgb(0 0 0 / 0.06);
   }
   figcaption {
+    display: grid;
+    gap: 2px;
     margin-top: 10px;
     color: var(--muted);
     font-size: 13px;
+  }
+  .mock-note {
+    font-size: 12px;
   }
 </style>

@@ -221,7 +221,7 @@ for (const locale of ['ja', 'en'] as const) {
     await expect(page.locator('.story > figure.screens')).toHaveCount(0);
     const screens = page.locator('#story-cover figure.screens');
     await expect(screens.locator('h2, h3')).toHaveCount(0);
-    await expect(screens.locator('figcaption')).toHaveText(locale === 'ja' ? '管理画面の例' : 'Example screens of the admin panel');
+    await expect(screens.locator('figcaption .caption')).toHaveText(locale === 'ja' ? '管理画面の例' : 'Example screens of the admin panel');
     const images = screens.locator('img');
     await expect(images).toHaveCount(2);
     for (const img of await images.all()) {

@@ -46,3 +46,12 @@ for (const locale of ['ja', 'en'] as const) {
     }
   });
 }
+
+for (const url of ['/projects/visa-docs/', '/projects/estimate-versions/', '/en/projects/visa-docs/', '/en/projects/estimate-versions/']) {
+  test(`the screens say their data is mock data, for security: ${url}`, async ({ page }) => {
+    await page.goto(url);
+    await expect(page.locator('figure.screens .mock-note')).toHaveText(
+      url.startsWith('/en/') ? 'The data on these screens is mock data, for security reasons.' : '※ 画面のデータは、セキュリティのためのダミーデータです。',
+    );
+  });
+}
