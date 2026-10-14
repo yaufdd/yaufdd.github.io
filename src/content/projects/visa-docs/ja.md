@@ -19,7 +19,7 @@ story:
       - { icon: pen-line, title: "旅行者", note: "Word の申請書に手で記入" }
       - { icon: user-cog, title: "担当者", note: "スキャンを見ながら手で転記" }
     result: { icon: files, title: "約 10 個の書類", note: "PDF と Word を 1 つずつ作成", from: 1 }
-    note: "ローマ字や日付のミスが 1 つあるだけで、書類は差し戻されます。"
+    note: "書類はすべて手作業で作っていたため、ローマ字のつづりや日付を 1 か所間違えるだけで受け付けてもらえませんでした。人為的なミスが、そのまま手続き全体を止めてしまうこともありました。"
   after:
     steps:
       - { icon: smartphone, title: "オンラインフォーム", note: "旅行者が自分で入力" }

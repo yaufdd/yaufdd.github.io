@@ -19,7 +19,7 @@ story:
       - { icon: pen-line, title: "Traveller", note: "fills in a Word form by hand" }
       - { icon: user-cog, title: "Staff", note: "retypes everything from the scans" }
     result: { icon: files, title: "~10 documents", note: "PDF and Word, one at a time", from: 1 }
-    note: "One typo in a name or a date, and the documents come back."
+    note: "Everything was typed by hand, so one misspelt name or a wrong date was enough for the documents to be rejected — human error could hold up the whole process."
   after:
     steps:
       - { icon: smartphone, title: "Online form", note: "travellers fill it in themselves" }

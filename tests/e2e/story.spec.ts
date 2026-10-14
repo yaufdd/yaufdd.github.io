@@ -45,7 +45,13 @@ test('before: traveller → staff → about 10 documents in one row, with the pa
   const result = (await flow.locator('li.result').boundingBox())!;
   expect(Math.abs(result.y - staff.y)).toBeLessThanOrEqual(2);
   expect(result.x).toBeGreaterThan(staff.x + staff.width);
-  await expect(page.locator('#story-change .note.pain')).toContainText('typo');
+  // The pain is explained in plain words (spelling mistakes got documents rejected: human error), not shouted in red.
+  const pain = page.locator('#story-change .note.pain');
+  await expect(pain).toContainText('misspelt');
+  await expect(pain).toContainText('human error');
+  const [r, g, b] = (await pain.evaluate((el) => getComputedStyle(el).color)).match(/\d+/g)!.map(Number);
+  expect(Math.max(r!, g!, b!) - Math.min(r!, g!, b!), 'grey, not red').toBeLessThanOrEqual(8);
+  await expect(pain).toHaveCSS('font-weight', '400');
 });
 
 test('before and now share one section, and the cards are compact', async ({ page }) => {

@@ -207,14 +207,17 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     color: var(--muted);
     font-size: 15px;
   }
+  /* The pain, in plain words: the same quiet grey as the other notes, with a small warning sign. */
   .pain {
-    color: #b3261e;
-    font-weight: 700;
+    align-items: flex-start;
+    max-width: 46em;
+    line-height: 1.7;
   }
   .pain :global(.icon) {
     flex: none;
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
+    margin-top: 4px;
   }
 
   /* Architecture */

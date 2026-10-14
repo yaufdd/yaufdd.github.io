@@ -22,7 +22,7 @@ const flow = z
     result: card.extend({ from: z.number().int().min(0) }).optional(),
     /** A helper the step `to` (0-based) works with back and forth, hanging under it (e.g. the AI under the admin panel). */
     aside: card.extend({ to: z.number().int().min(0) }).optional(),
-    note: z.string().min(1).max(140).optional(),
+    note: z.string().min(1).max(220).optional(),
   })
   .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' })
   .refine((f) => !f.aside || f.aside.to < f.steps.length, { message: 'aside.to must point at one of the steps' });
