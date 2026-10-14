@@ -1,6 +1,7 @@
 ---
 import '../styles/prose.css';
 import { render } from 'astro:content';
+import Avatar3D from '../components/Avatar3D.astro';
 import CaseMeta from '../components/CaseMeta.astro';
 import Story from '../components/story/Story.astro';
 import Lightbox from '../components/Lightbox.astro';
@@ -33,7 +34,10 @@ const next = projects.length > 1 ? projects[(at + 1) % projects.length] : undefi
         <h1 class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
         <p class="lead">{data.summary}</p>
         <CaseMeta locale={locale} data={data} />
-        <div class="prose"><Content /></div>
+        <div class="body">
+          <div class="prose"><Content /></div>
+          <div class="figure"><Avatar3D label={t(locale, 'home.avatarAlt')} /></div>
+        </div>
       </article>
     )
   }
@@ -43,6 +47,29 @@ const next = projects.length > 1 ? projects[(at + 1) % projects.length] : undefi
 <style>
   .case {
     padding-bottom: 64px;
+  }
+  /*
+   * The 3D figure stands to the right of the last section (the retrospective): that section is narrower, and the
+   * figure sits at the bottom right of the text. On a phone it comes under the text.
+   */
+  .figure {
+    width: 150px;
+    margin: 32px auto 0;
+  }
+  @media (min-width: 900px) {
+    .body {
+      position: relative;
+    }
+    .prose :global(h2:last-of-type),
+    .prose :global(h2:last-of-type ~ *) {
+      margin-right: 200px;
+    }
+    .figure {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+    }
   }
   .back {
     display: inline-block;

@@ -73,3 +73,32 @@ test('the lightbox works from the keyboard', async ({ page }) => {
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(page.locator('dialog.lightbox')).toBeHidden();
 });
+
+for (const url of ['/projects/pacxpuctanno/', '/en/projects/pacxpuctanno/']) {
+  test(`the 3D figure stands to the right of the retrospective, beside it and clear of the text: ${url}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(url);
+    const figure = page.locator('.case [data-avatar]');
+    await expect(figure).toHaveCount(1);
+    await figure.scrollIntoViewIfNeeded();
+    const a = (await figure.boundingBox())!;
+    // The retrospective is the last section: its heading and everything after it.
+    const retro = await page.locator('.prose > h2').last().evaluate((h) => {
+      const els = [h, ...[...h.parentElement!.children].slice([...h.parentElement!.children].indexOf(h) + 1)];
+      const rects = els.map((el) => el.getBoundingClientRect());
+      return { top: Math.min(...rects.map((r) => r.top)) + window.scrollY, bottom: Math.max(...rects.map((r) => r.bottom)) + window.scrollY, right: Math.max(...rects.map((r) => r.right)) };
+    });
+    const top = a.y + (await page.evaluate(() => window.scrollY));
+    expect(a.x, 'to the right of the text').toBeGreaterThanOrEqual(retro.right);
+    expect(top, 'beside the retrospective, not higher').toBeGreaterThanOrEqual(retro.top - 1);
+    expect(top + a.height, 'beside the retrospective, not lower').toBeLessThanOrEqual(retro.bottom + 40);
+  });
+}
+
+test('on a phone the figure of an article case sits under the retrospective', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto('/projects/pacxpuctanno/');
+  const last = (await page.locator('.prose > *').last().boundingBox())!;
+  const a = (await page.locator('.case [data-avatar]').boundingBox())!;
+  expect(a.y).toBeGreaterThanOrEqual(last.y + last.height);
+});
