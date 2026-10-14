@@ -20,8 +20,8 @@
       cursor: url('/cursors/sakura.png') 14 14, auto !important;
       cursor: image-set(url('/cursors/sakura.png') 1x, url('/cursors/sakura@2x.png') 2x) 14 14, auto !important;
     }
-    html :is(a, button, summary, [data-avatar]),
-    html :is(a, button, summary, [data-avatar]) * {
+    html :is(a, button, summary, [role='button'], [data-avatar]),
+    html :is(a, button, summary, [role='button'], [data-avatar]) * {
       cursor: url('/cursors/sakura-link.png') 18 18, pointer !important;
       cursor: image-set(url('/cursors/sakura-link.png') 1x, url('/cursors/sakura-link@2x.png') 2x) 18 18, pointer !important;
     }

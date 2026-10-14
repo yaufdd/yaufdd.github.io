@@ -37,7 +37,7 @@ const { locale } = Astro.props;
       dialog.showModal();
     };
 
-    document.querySelectorAll<HTMLImageElement>('.prose img').forEach((img) => {
+    document.querySelectorAll<HTMLImageElement>('.prose img, [data-lightbox] img').forEach((img) => {
       img.tabIndex = 0;
       img.setAttribute('role', 'button');
       img.addEventListener('click', () => open(img));

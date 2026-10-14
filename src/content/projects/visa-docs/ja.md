@@ -39,6 +39,11 @@ story:
     aside: { icon: sparkles, title: "AI（OCR + LLM）", note: "スキャンを読み取り JSON で返す", to: 1 }
     result: { icon: folder-check, title: "約 10 個の完成ファイル", note: "グループ全員分を一括生成", from: 1 }
     note: "グループ全員の入力がそろった時点で、書類一式がまとめて生成されます。"
+  screens:
+    caption: "管理画面の例"
+    items:
+      - { image: "./images/admin-home.png", alt: "管理画面のホーム：フライト・チケット・ホテル・テンプレートと新規予約" }
+      - { image: "./images/admin-groups.png", alt: "グループの画面：旅行者とホテルの一覧（テストデータ）" }
   architecture:
     layers:
       - { icon: globe, title: "ブラウザ", note: "管理画面・旅行者フォーム" }

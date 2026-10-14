@@ -22,6 +22,7 @@ interface Story {
   task: { text: string; documents?: { title: string; items: string[]; note?: string; example?: { image: string; href: string } } };
   before?: Flow;
   after: Flow;
+  screens?: { caption: string; items: { image: string; alt: string }[] };
   architecture: { layers: Card[]; leaves: Card[]; note?: string };
   highlights: { title: string; text: string }[];
   outcome: string[];
@@ -49,6 +50,7 @@ const shape = (story: Story) => {
     documents: story.task.documents && [story.task.documents.items.length, Boolean(story.task.documents.note), story.task.documents.example?.image, story.task.documents.example?.href],
     before: flow(story.before),
     after: flow(story.after),
+    screens: story.screens?.items.map((s) => s.image),
     architecture: [story.architecture.layers.map((c) => c.icon), story.architecture.leaves.map((c) => c.icon), Boolean(story.architecture.note)],
     highlights: story.highlights.length,
     outcome: story.outcome.length,

@@ -39,6 +39,11 @@ story:
     aside: { icon: sparkles, title: "AI (OCR + LLM)", note: "reads the scans, returns JSON", to: 1 }
     result: { icon: folder-check, title: "~10 ready files", note: "for the whole group at once", from: 1 }
     note: "As soon as everyone in the group has filled in the form, the whole set is generated in one go."
+  screens:
+    caption: "Example screens of the admin panel"
+    items:
+      - { image: "./images/admin-home.png", alt: "Admin panel home: flights, tickets, hotels, templates and a new booking" }
+      - { image: "./images/admin-groups.png", alt: "Group screen: travellers and hotels (test data)" }
   architecture:
     layers:
       - { icon: globe, title: "Browser", note: "admin panel · traveller form" }

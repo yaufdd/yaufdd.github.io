@@ -212,3 +212,24 @@ test('pacxpuctanno keeps the article layout for now', async ({ page }) => {
   await expect(page.locator('.story')).toHaveCount(0);
   await expect(page.locator('.prose h2').first()).toBeVisible();
 });
+
+for (const locale of ['ja', 'en'] as const) {
+  test(`${locale}: example screens of the admin panel sit between before-and-now and the architecture, and open large`, async ({ page }) => {
+    await page.goto(locale === 'ja' ? '/projects/visa-docs/' : '/en/projects/visa-docs/');
+    const order = await page.locator('.story > *').evaluateAll((els) => els.map((e) => e.id || (e.classList.contains('screens') ? 'screens' : e.tagName)));
+    expect(order.indexOf('screens'), 'right after before-and-now').toBe(order.indexOf('story-change') + 1);
+    expect(order.indexOf('story-architecture'), 'right before the architecture').toBe(order.indexOf('screens') + 1);
+    const screens = page.locator('.story > figure.screens');
+    await expect(screens.locator('h2, h3')).toHaveCount(0);
+    await expect(screens.locator('figcaption')).toHaveText(locale === 'ja' ? '管理画面の例' : 'Example screens of the admin panel');
+    const images = screens.locator('img');
+    await expect(images).toHaveCount(2);
+    for (const img of await images.all()) {
+      await expect(img).toBeVisible();
+      await expect(img).toHaveAttribute('alt', /.+/);
+    }
+    await images.first().click();
+    await expect(page.locator('dialog.lightbox')).toBeVisible();
+    await expect(page.locator('dialog.lightbox img.full')).toHaveAttribute('src', /admin-home/);
+  });
+}
