@@ -11,6 +11,11 @@ const paintedPixels = (page: Page) =>
     return n;
   });
 
+/** Computed cursor values: the flower image for ordinary places, a bigger flower for things to click. */
+const FLOWER = /url\("[^"]*\/cursors\/sakura\.png"\)/;
+const FLOWER_LINK = /url\("[^"]*\/cursors\/sakura-link\.png"\)/;
+const cursorOf = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).cursor);
+
 const sweep = async (page: Page) => {
   await page.mouse.move(200, 400);
   for (let i = 1; i <= 30; i++) await page.mouse.move(200 + i * 25, 400 + Math.sin(i / 4) * 80);
@@ -42,30 +47,36 @@ test('the petals never get in the way of clicks', async ({ page }) => {
 });
 
 for (const url of ['/about/', '/en/', '/projects/visa-docs/', '/en/projects/pacxpuctanno/', '/404.html']) {
-  test(`petals and the hidden arrow on every page: ${url}`, async ({ page }) => {
+  test(`petals and the flower cursor on every page: ${url}`, async ({ page }) => {
     await page.goto(url);
     await expect(page.locator('[data-sakura]')).toHaveCount(1);
-    await expect(page.locator('body')).toHaveCSS('cursor', 'none');
+    expect(await cursorOf(page, 'body')).toMatch(FLOWER);
     await sweep(page);
     await expect.poll(() => paintedPixels(page)).toBeGreaterThan(200);
   });
 }
 
-test('in the screenshot viewer the arrow comes back, since the petals cannot show above it', async ({ page }) => {
+test('the screenshot viewer keeps the flower cursor', async ({ page }) => {
   await page.goto('/projects/pacxpuctanno/');
   await page.locator('.prose img').first().click();
-  const dialog = page.locator('dialog.lightbox');
-  await expect(dialog).toBeVisible();
-  await expect(dialog).not.toHaveCSS('cursor', 'none');
-  await expect(dialog.locator('button.close')).toHaveCSS('cursor', 'pointer');
-  await page.keyboard.press('Escape');
-  await expect(page.locator('body')).toHaveCSS('cursor', 'none');
+  await expect(page.locator('dialog.lightbox')).toBeVisible();
+  expect(await cursorOf(page, 'dialog.lightbox')).toMatch(FLOWER);
+  expect(await cursorOf(page, 'dialog.lightbox button.close')).toMatch(FLOWER_LINK);
 });
 
-test('the arrow is hidden everywhere on the page: the petals show where the pointer is', async ({ page }) => {
+test('the arrow is a sakura flower; over links and the 3D figure it is a bigger one', async ({ page }) => {
   await page.goto('/');
-  for (const target of ['body', '.projects a', '.hello h1', '[data-avatar]']) {
-    await expect(page.locator(target).first(), target).toHaveCSS('cursor', 'none');
+  for (const target of ['body', '.hello h1', '.experience p']) expect(await cursorOf(page, target), target).toMatch(FLOWER);
+  for (const target of ['.projects a', '.contacts a', '.lang a', '[data-avatar]']) expect(await cursorOf(page, target), target).toMatch(FLOWER_LINK);
+  // The arrow is never hidden: the flower is a real cursor, so the pointer is visible even when it stands still.
+  expect(await cursorOf(page, 'body')).not.toBe('none');
+});
+
+test('the flower cursor images are served and small', async ({ request }) => {
+  for (const file of ['sakura.png', 'sakura@2x.png', 'sakura-link.png', 'sakura-link@2x.png']) {
+    const response = await request.get(`/cursors/${file}`);
+    expect(response.status(), file).toBe(200);
+    expect((await response.body()).byteLength, file).toBeLessThan(20 * 1024);
   }
 });
 
@@ -78,10 +89,10 @@ test.describe('reduced motion', () => {
     await page.waitForTimeout(300);
     expect(await paintedPixels(page)).toBe(0);
   });
-  test('without petals the normal arrow stays, so the pointer is never lost', async ({ page }) => {
+  test('the flower cursor stays (it does not move by itself)', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('body')).not.toHaveCSS('cursor', 'none');
-    await expect(page.locator('.projects a').first()).toHaveCSS('cursor', 'pointer');
+    expect(await cursorOf(page, 'body')).toMatch(FLOWER);
+    expect(await cursorOf(page, '.projects a')).toMatch(FLOWER_LINK);
   });
 });
 

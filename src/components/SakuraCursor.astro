@@ -1,4 +1,4 @@
-{/* Sakura petals falling from the mouse pointer (src/lib/sakura.ts); never on touch screens or with reduced motion. */}
+{/* Sakura petals falling from the mouse pointer (src/lib/sakura.ts; never on touch screens or with reduced motion) and the sakura flower cursor. */}
 <canvas class="sakura" data-sakura aria-hidden="true"></canvas>
 
 <script>
@@ -9,18 +9,22 @@
 </script>
 
 <style is:global>
-  /* The arrow is hidden while the petals run (class set by startSakura). */
-  html.sakura-cursor,
-  html.sakura-cursor * {
-    cursor: none !important;
-  }
-  /* A modal (the screenshot viewer) sits above the petals' canvas: there the normal arrow comes back. */
-  html.sakura-cursor:has(dialog[open]),
-  html.sakura-cursor:has(dialog[open]) * {
-    cursor: auto !important;
-  }
-  html.sakura-cursor:has(dialog[open]) dialog :is(button, a) {
-    cursor: pointer !important;
+  /*
+   * The arrow is a sakura flower (its hotspot is the centre); over things to click, a bigger, deeper pink one.
+   * A real cursor, so it never lags, works without JavaScript and with reduced motion, and shows above dialogs.
+   * The plain url() is the fallback for browsers without image-set() in cursors.
+   */
+  @media (hover: hover) and (pointer: fine) {
+    html,
+    html * {
+      cursor: url('/cursors/sakura.png') 14 14, auto !important;
+      cursor: image-set(url('/cursors/sakura.png') 1x, url('/cursors/sakura@2x.png') 2x) 14 14, auto !important;
+    }
+    html :is(a, button, summary, [data-avatar]),
+    html :is(a, button, summary, [data-avatar]) * {
+      cursor: url('/cursors/sakura-link.png') 18 18, pointer !important;
+      cursor: image-set(url('/cursors/sakura-link.png') 1x, url('/cursors/sakura-link@2x.png') 2x) 18 18, pointer !important;
+    }
   }
 </style>
 

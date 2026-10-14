@@ -149,17 +149,12 @@ function sprites(scale: number): Record<Petal['kind'], HTMLCanvasElement> {
   };
 }
 
-/** CSS hook: set on <html> while the petals run, to hide the arrow (the petals show where the pointer is). */
-export const SAKURA_CURSOR_CLASS = 'sakura-cursor';
-
 /** Starts the petals on a full-viewport canvas; does nothing on touch screens or with reduced motion. */
 export function startSakura(canvas: HTMLCanvasElement): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  // Only now, with the petals certain to run: without them the arrow stays, so the pointer is never lost.
-  document.documentElement.classList.add(SAKURA_CURSOR_CLASS);
 
   let dpr = 1;
   let images = sprites(1);
