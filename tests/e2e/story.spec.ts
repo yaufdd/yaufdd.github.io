@@ -129,7 +129,7 @@ test('highlights are short cards and the last section links to the next project 
   await expect(cards.nth(2)).toContainText('ChatGPT');
   await expect(cards.nth(2)).toContainText('YandexGPT');
   await expect(cards.nth(2)).toContainText('プロンプト');
-  await expect(page.locator('#story-outcome a[href="/projects/pacxpuctanno/"]')).toBeVisible();
+  await expect(page.locator('#story-outcome a[href="/projects/estimate-versions/"]')).toBeVisible();
   await expect(page.locator('#story-outcome a[href="/"]')).toBeVisible();
 });
 

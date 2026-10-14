@@ -12,7 +12,7 @@ links: { live: "https://pacxpuctanno.shop" }
 devProcess: Spec and implementation plan written with Claude Code before coding (kept in the repository).
 cover: ./images/cover.png
 coverAlt: "~/projects/pacxpuctanno — terminal-style cover image"
-order: 2
+order: 3
 ---
 
 ## Problem
