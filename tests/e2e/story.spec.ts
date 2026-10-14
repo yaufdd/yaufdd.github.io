@@ -116,12 +116,19 @@ test('architecture: browser → Traefik/nginx → Go, branching to PostgreSQL, Y
   const arch = page.locator('#story-architecture');
   await expect(arch.locator('.layers b')).toHaveText(['Browser', 'Traefik → nginx', 'Go backend']);
   await expect(arch.locator('.leaves b')).toHaveText(['PostgreSQL', 'Yandex Cloud', 'Python']);
+  // PostgreSQL needs no caption; Yandex Cloud simply says what it is used for.
+  await expect(arch.locator('.leaves li').nth(0).locator('span')).toHaveCount(0);
+  await expect(arch.locator('.leaves li').nth(1).locator('span')).toHaveText('AI');
 });
 
 test('highlights are short cards and the last section links to the next project and home', async ({ page }) => {
   await page.goto('/projects/visa-docs/');
   const cards = page.locator('#story-highlights .highlights li');
-  expect(await cards.count()).toBeGreaterThanOrEqual(3);
+  await expect(cards.locator('b')).toHaveText(['AI は必要な所だけ', '失敗の扱いを使い分け', '個人データは国内に']);
+  // Why YandexGPT: Claude and ChatGPT could not be used, and the weaker model was made up for with prompting.
+  await expect(cards.nth(2)).toContainText('ChatGPT');
+  await expect(cards.nth(2)).toContainText('YandexGPT');
+  await expect(cards.nth(2)).toContainText('プロンプト');
   await expect(page.locator('#story-outcome a[href="/projects/pacxpuctanno/"]')).toBeVisible();
   await expect(page.locator('#story-outcome a[href="/"]')).toBeVisible();
 });

@@ -44,7 +44,7 @@ const story = (image: SchemaContext['image']) =>
     before: flow.optional(),
     after: flow,
     architecture: z.object({ layers: z.array(card).min(1).max(4), leaves: z.array(card).min(1).max(4), note: z.string().min(1).max(140).optional() }),
-    highlights: z.array(z.object({ title: z.string().min(1).max(32), text: z.string().min(1).max(100) })).min(2).max(6),
+    highlights: z.array(z.object({ title: z.string().min(1).max(32), text: z.string().min(1).max(150) })).min(2).max(6),
     outcome: z.array(z.string().min(1).max(100)).min(1).max(3),
   });
 

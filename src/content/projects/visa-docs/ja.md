@@ -45,16 +45,14 @@ story:
       - { icon: shield, title: "Traefik → nginx", note: "TLS・React SPA・/api プロキシ" }
       - { icon: server, title: "Go バックエンド", note: "単一バイナリ・chi" }
     leaves:
-      - { icon: database, title: "PostgreSQL", note: "組織ごとに分離" }
-      - { icon: cloud, title: "Yandex Cloud", note: "GPT・Vision OCR" }
+      - { icon: database, title: "PostgreSQL" }
+      - { icon: cloud, title: "Yandex Cloud", note: "AI" }
       - { icon: file-code, title: "Python", note: "DOCX・PDF を生成" }
     note: "依存の向きが一方向のレイヤードモノリス。バイナリは 1 つです。"
   highlights:
-    - { title: "組織 ID は必須の引数", text: "フィルタの書き忘れはコンパイルエラー。RLS の役割をコンパイラが担います。" }
     - { title: "AI は必要な所だけ", text: "ルールで決まる処理は Go のコード。最終判断は常にコードが下します。" }
     - { title: "失敗の扱いを使い分け", text: "翻訳の失敗は生成を止め、格変化の失敗は警告にとどめて続行します。" }
-    - { title: "モデルのフォールバック", text: "YandexGPT が回答を拒否したら、Qwen3-235B が答えます。" }
-    - { title: "個人データは国内に", text: "AI もすべて国内のクラウドで実行（152-FZ に対応）。" }
+    - { title: "個人データは国内に", text: "個人データを国外に出せないため、Claude や ChatGPT は使えず YandexGPT を採用。モデルの弱さは、プロンプトの調整で補いました。" }
   outcome:
     - "次の一手は、書類生成をジョブキューに移すこと。"
     - "規模に応じて、ハンドラーからサービス層を切り出します。"

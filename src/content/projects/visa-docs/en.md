@@ -45,16 +45,14 @@ story:
       - { icon: shield, title: "Traefik → nginx", note: "TLS · React SPA · /api proxy" }
       - { icon: server, title: "Go backend", note: "one binary · chi" }
     leaves:
-      - { icon: database, title: "PostgreSQL", note: "isolated per organisation" }
-      - { icon: cloud, title: "Yandex Cloud", note: "GPT · Vision OCR" }
+      - { icon: database, title: "PostgreSQL" }
+      - { icon: cloud, title: "Yandex Cloud", note: "AI" }
       - { icon: file-code, title: "Python", note: "generates DOCX and PDF" }
     note: "A layered monolith with one-way dependencies, shipped as a single binary."
   highlights:
-    - { title: "Tenant ID is a required argument", text: "A forgotten filter does not compile: the compiler does the job of row-level security." }
     - { title: "AI only where it is needed", text: "Rules live in Go code, and the code always has the last word." }
     - { title: "Failures handled on purpose", text: "A failed translation stops generation; a failed declension only warns." }
-    - { title: "Model fallback", text: "If YandexGPT refuses to answer, Qwen3-235B steps in." }
-    - { title: "Personal data stays at home", text: "All AI runs in a domestic cloud, as Russian law 152-FZ requires." }
+    - { title: "Personal data stays at home", text: "Personal data may not leave the country, so Claude and ChatGPT were out: I used YandexGPT and made up for the weaker model with prompting." }
   outcome:
     - "Next: move document generation to a job queue."
     - "As it grows, pull a service layer out of the handlers."
