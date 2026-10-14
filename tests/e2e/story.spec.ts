@@ -1,10 +1,11 @@
 import { expect, test } from './fixtures';
 
-const SECTIONS = ['cover', 'task', 'before', 'after', 'architecture', 'highlights', 'outcome'];
+const SECTIONS = ['cover', 'task', 'change', 'architecture', 'highlights', 'outcome'];
 const HEADINGS = {
-  ja: { task: '課題', before: '以前', after: '現在', architecture: 'アーキテクチャ', highlights: '技術的な工夫', outcome: '振り返りと次の一手' },
-  en: { task: 'The problem', before: 'Before', after: 'Now', architecture: 'Architecture', highlights: 'Technical highlights', outcome: 'What’s next' },
+  ja: { task: '課題', change: '以前と現在', architecture: 'アーキテクチャ', highlights: '技術的な工夫', outcome: '振り返りと次の一手' },
+  en: { task: 'The problem', change: 'Before and now', architecture: 'Architecture', highlights: 'Technical highlights', outcome: 'What’s next' },
 } as const;
+const ROWS = { ja: ['以前', '現在'], en: ['Before', 'Now'] } as const;
 
 for (const locale of ['ja', 'en'] as const) {
   const url = locale === 'ja' ? '/projects/visa-docs/' : '/en/projects/visa-docs/';
@@ -15,6 +16,7 @@ for (const locale of ['ja', 'en'] as const) {
     for (const [id, heading] of Object.entries(HEADINGS[locale])) {
       await expect(page.locator(`#story-${id} h2`)).toHaveText(heading);
     }
+    await expect(page.locator('#story-change h3')).toHaveText([...ROWS[locale]]);
     await expect(page.locator('#story-cover h1')).toContainText(locale === 'ja' ? 'ビザ申請書類' : 'Visa Document Automation');
   });
 
@@ -31,18 +33,35 @@ for (const locale of ['ja', 'en'] as const) {
   });
 }
 
-test('before: traveller → staff → about 10 documents, with the pain spelled out', async ({ page }) => {
+test('before: traveller → staff → about 10 documents in one row, with the pain spelled out', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/en/projects/visa-docs/');
-  const flow = page.locator('#story-before .flow');
+  const flow = page.locator('#story-change .flow.before');
   await expect(flow.locator('li.step b')).toHaveText(['Traveller', 'Staff']);
   await expect(flow.locator('li.result b')).toHaveText('~10 documents');
-  await expect(page.locator('#story-before .note')).toContainText('typo');
+  // The result comes from the last step, so it simply follows it in the same row.
+  await expect(flow.locator('li.step').nth(1)).toHaveAttribute('data-link', 'next');
+  const staff = (await flow.locator('li.step').nth(1).boundingBox())!;
+  const result = (await flow.locator('li.result').boundingBox())!;
+  expect(Math.abs(result.y - staff.y)).toBeLessThanOrEqual(2);
+  expect(result.x).toBeGreaterThan(staff.x + staff.width);
+  await expect(page.locator('#story-change .note.pain')).toContainText('typo');
+});
+
+test('before and now share one section, and the cards are compact', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/projects/visa-docs/');
+  await expect(page.locator('#story-change .flow')).toHaveCount(2);
+  for (const card of await page.locator('#story-change li').all()) {
+    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(90);
+  }
+  expect((await page.locator('#story-change').boundingBox())!.height).toBeLessThan(800);
 });
 
 test('now: online form → admin panel ⇄ AI, and the admin panel hands out the files for the whole group', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/en/projects/visa-docs/');
-  const flow = page.locator('#story-after .flow');
+  const flow = page.locator('#story-change .flow.after');
   await expect(flow.locator('li.step b')).toHaveText(['Online form', 'Admin panel', 'AI (OCR + LLM)']);
   await expect(flow.locator('li.step').nth(1)).toHaveAttribute('data-link', 'both');
   await expect(flow.locator('li.step').nth(0)).toHaveAttribute('data-link', 'next');
@@ -52,7 +71,7 @@ test('now: online form → admin panel ⇄ AI, and the admin panel hands out the
   const result = (await flow.locator('li.result').boundingBox())!;
   expect(Math.abs(result.x + result.width / 2 - (admin.x + admin.width / 2))).toBeLessThanOrEqual(4);
   expect(result.y).toBeGreaterThan(admin.y + admin.height);
-  await expect(page.locator('#story-after .note')).toContainText('whole set');
+  await expect(page.locator('#story-change .note:not(.pain)')).toContainText('whole set');
 });
 
 test('architecture: browser → Traefik/nginx → Go, branching to PostgreSQL, Yandex Cloud and Python', async ({ page }) => {
@@ -102,7 +121,7 @@ test('“Read more” is folded and holds the full case text', async ({ page }) 
 test('on a phone the flow runs top to bottom', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto('/projects/visa-docs/');
-  const tops = await page.locator('#story-after .flow li').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().top));
+  const tops = await page.locator('#story-change .flow.after li').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().top));
   expect(tops.length).toBe(4);
   expect([...tops].sort((a, b) => a - b)).toEqual(tops);
 });
@@ -111,7 +130,7 @@ test('nothing fades in: every card and arrow is there from the start, even far d
   await page.goto('/projects/visa-docs/');
   await expect(page.locator('.story [data-reveal]')).toHaveCount(0);
   for (const card of await page.locator('.story li').all()) await expect(card).toHaveCSS('opacity', '1');
-  const arrow = await page.locator('#story-after li.step').first().evaluate((el) => getComputedStyle(el, '::after').transform);
+  const arrow = await page.locator('#story-change .flow.after li.step').first().evaluate((el) => getComputedStyle(el, '::after').transform);
   expect(arrow).toMatch(/^(none|matrix(1, 0, 0, 1, 0, 0))$/);
 });
 

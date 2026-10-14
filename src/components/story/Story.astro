@@ -34,25 +34,27 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     <p class="statement">{taskParts.map((part, i) => (i % 2 ? <strong>{part}</strong> : part))}</p>
   </section>
 
-  {
-    story.before && (
-      <section id="story-before" aria-labelledby="story-before-title">
-        <h2 id="story-before-title">{t(locale, 'story.before')}</h2>
-        <Flow flow={story.before} />
-        {story.before.note && (
-          <p class="note pain">
-            <Icon name="triangle-alert" />
-            {story.before.note}
-          </p>
-        )}
-      </section>
-    )
-  }
-
-  <section id="story-after" aria-labelledby="story-after-title">
-    <h2 id="story-after-title">{t(locale, 'story.after')}</h2>
-    <Flow flow={story.after} />
-    {story.after.note && <p class="note">{story.after.note}</p>}
+  <section id="story-change" aria-labelledby="story-change-title">
+    <h2 id="story-change-title">{t(locale, story.before ? 'story.change' : 'story.after')}</h2>
+    {
+      story.before && (
+        <div class="row">
+          <h3>{t(locale, 'story.before')}</h3>
+          <Flow flow={story.before} kind="before" />
+          {story.before.note && (
+            <p class="note pain">
+              <Icon name="triangle-alert" />
+              {story.before.note}
+            </p>
+          )}
+        </div>
+      )
+    }
+    <div class="row">
+      {story.before && <h3>{t(locale, 'story.after')}</h3>}
+      <Flow flow={story.after} kind="after" />
+      {story.after.note && <p class="note">{story.after.note}</p>}
+    </div>
   </section>
 
   <section id="story-architecture" aria-labelledby="story-architecture-title">
@@ -178,6 +180,22 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
   }
   .statement strong {
     font-weight: 800;
+  }
+
+  /* Before and now: two rows in one section. */
+  .row {
+    display: grid;
+    gap: 14px;
+  }
+  .row + .row {
+    margin-top: 16px;
+  }
+  h3 {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
   }
 
   /* Notes under the flows */
