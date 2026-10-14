@@ -40,6 +40,7 @@ story:
     result: { icon: folder-check, title: "約 10 個の完成ファイル", note: "グループ全員分を一括生成", from: 1 }
     note: "グループ全員の入力がそろった時点で、書類一式がまとめて生成されます。"
   screens:
+    at: top
     caption: "管理画面の例"
     items:
       - { image: "./images/admin-home.png", alt: "管理画面のホーム：フライト・チケット・ホテル・テンプレートと新規予約" }

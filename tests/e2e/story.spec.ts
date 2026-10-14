@@ -214,12 +214,12 @@ test('pacxpuctanno keeps the article layout for now', async ({ page }) => {
 });
 
 for (const locale of ['ja', 'en'] as const) {
-  test(`${locale}: example screens of the admin panel sit between before-and-now and the architecture, and open large`, async ({ page }) => {
+  test(`${locale}: example screens of the admin panel sit right under the summary, and open large`, async ({ page }) => {
     await page.goto(locale === 'ja' ? '/projects/visa-docs/' : '/en/projects/visa-docs/');
-    const order = await page.locator('.story > *').evaluateAll((els) => els.map((e) => e.id || (e.classList.contains('screens') ? 'screens' : e.tagName)));
-    expect(order.indexOf('screens'), 'right after before-and-now').toBe(order.indexOf('story-change') + 1);
-    expect(order.indexOf('story-architecture'), 'right before the architecture').toBe(order.indexOf('screens') + 1);
-    const screens = page.locator('.story > figure.screens');
+    // Right under the summary, so the screens are the first thing you see.
+    expect(await page.locator('#story-cover .lead').evaluate((el) => el.nextElementSibling?.matches('figure.screens'))).toBe(true);
+    await expect(page.locator('.story > figure.screens')).toHaveCount(0);
+    const screens = page.locator('#story-cover figure.screens');
     await expect(screens.locator('h2, h3')).toHaveCount(0);
     await expect(screens.locator('figcaption')).toHaveText(locale === 'ja' ? '管理画面の例' : 'Example screens of the admin panel');
     const images = screens.locator('img');

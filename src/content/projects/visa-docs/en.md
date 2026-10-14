@@ -40,6 +40,7 @@ story:
     result: { icon: folder-check, title: "~10 ready files", note: "for the whole group at once", from: 1 }
     note: "As soon as everyone in the group has filled in the form, the whole set is generated in one go."
   screens:
+    at: top
     caption: "Example screens of the admin panel"
     items:
       - { image: "./images/admin-home.png", alt: "Admin panel home: flights, tickets, hotels, templates and a new booking" }
