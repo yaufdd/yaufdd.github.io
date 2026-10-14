@@ -1,6 +1,16 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { expect, test } from './fixtures';
+import { expect, test, type Page } from './fixtures';
+
+/**
+ * Opens a page for layout checks with entrance animations off: blocks slide up 12px as they fade in, and a layout
+ * measured mid-slide is off by up to that much (it made the one-screen checks flaky and hid a real overlap).
+ * The animations themselves are covered by home-motion.spec.ts.
+ */
+async function open(page: Page, url: string) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(url);
+}
 
 const ROOT = 'src/content/projects';
 
@@ -34,7 +44,7 @@ for (const size of [
 ]) {
   test(`everything fits on one ${size.width}×${size.height} screen`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await open(page, '/');
     const overflow = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
     expect(overflow).toBeLessThanOrEqual(1);
     const blocks = ['.photo', '.hello', '.projects', '.skills', '.experience', '.education', '.contacts', '[data-avatar]'];
@@ -47,11 +57,14 @@ for (const size of [
       boxes.slice(i + 1).filter((b) => a.box.x < b.box.x + b.box.width && b.box.x < a.box.x + a.box.width && a.box.y < b.box.y + b.box.height && b.box.y < a.box.y + a.box.height).map((b) => `${a.s} × ${b.s}`),
     );
     expect(overlaps).toEqual([]);
+    // And the project list keeps clear of the contacts row.
+    const gap = (await page.locator('.contacts').boundingBox())!.y - (await page.locator('.projects').evaluate((el) => el.getBoundingClientRect().bottom));
+    expect(gap, 'space between the projects and the contacts').toBeGreaterThanOrEqual(12);
   });
 
   test(`the square 2D card starts level with the greeting, education under it, projects under the greeting at ${size.width}×${size.height}`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await open(page, '/');
     const [photo, greeting, education, projects] = await Promise.all(
       ['.photo', '.hello h1', '.education', '.projects'].map(async (s) => (await page.locator(s).boundingBox())!),
     );
@@ -66,7 +79,7 @@ for (const size of [
 
   test(`the contacts sit together, starting at the left edge under the 2D card's column, at ${size.width}×${size.height}`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await open(page, '/');
     const [photo, education] = await Promise.all(['.photo', '.education'].map(async (s) => (await page.locator(s).boundingBox())!));
     const items = await Promise.all((await page.locator('.contacts li').all()).map(async (li) => (await li.boundingBox())!));
     expect(Math.abs(items[0]!.x - photo!.x)).toBeLessThanOrEqual(2);
@@ -77,7 +90,7 @@ for (const size of [
   test(`each project's description fits on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
     await page.setViewportSize(size);
     for (const url of ['/', '/en/']) {
-      await page.goto(url);
+      await open(page, url);
       const lines = await page.locator('.projects a span').evaluateAll((els) =>
         els.map((e) => e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)),
       );
@@ -89,7 +102,7 @@ for (const size of [
   test(`the greeting stays on one line at ${size.width}×${size.height} in both languages`, async ({ page }) => {
     await page.setViewportSize(size);
     for (const url of ['/', '/en/']) {
-      await page.goto(url);
+      await open(page, url);
       const { height, fontSize } = await page.locator('.hello h1').evaluate((h) => ({ height: h.getBoundingClientRect().height, fontSize: parseFloat(getComputedStyle(h).fontSize) }));
       expect(height, url).toBeLessThan(fontSize * 1.6);
     }
@@ -100,7 +113,7 @@ for (const locale of ['ja', 'en'] as const) {
   const home = locale === 'ja' ? '/' : '/en/';
 
   test(`${locale}: every heading is in the page's language`, async ({ page }) => {
-    await page.goto(home);
+    await open(page, home);
     const h = HEADINGS[locale];
     await expect(page.locator('.hello h1')).toHaveText(h.hello);
     await expect(page.locator('.projects h2')).toHaveText(h.projects);
@@ -110,13 +123,13 @@ for (const locale of ['ja', 'en'] as const) {
   });
 
   test(`${locale}: the greeting introduces me, without the small head picture`, async ({ page }) => {
-    await page.goto(home);
+    await open(page, home);
     await expect(page.locator('.hello .bio')).toContainText(locale === 'ja' ? '番場エリク' : 'Eric Bamba');
     await expect(page.locator('.hello img')).toHaveCount(0);
   });
 
   test(`${locale}: the projects section links to every project and the workflow, each with a description`, async ({ page }) => {
-    await page.goto(home);
+    await open(page, home);
     const expected = expectedProjectLinks(locale);
     expect(expected.length).toBeGreaterThan(0);
     const links = page.locator('.projects a');
@@ -131,7 +144,7 @@ for (const locale of ['ja', 'en'] as const) {
   });
 
   test(`${locale}: skills, experience, education and contacts`, async ({ page }) => {
-    await page.goto(home);
+    await open(page, home);
     expect(await page.locator('.skills li').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))).toEqual([
       'Go',
       'React',
@@ -155,7 +168,7 @@ for (const size of [
 ]) {
   test(`the left panel shows the whole 2D avatar, uncropped, at ${size.width}px`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await open(page, '/');
     const img = page.locator('.photo img');
     await expect(img).toHaveAttribute('alt', '番場エリクのイラスト');
     const info = await img.evaluate((el: HTMLImageElement) => ({
@@ -172,7 +185,7 @@ for (const size of [
 
 test('on a phone the blocks stack: picture, hello, projects, skills, experience, education, contacts', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
-  await page.goto('/');
+  await open(page, '/');
   const tops = await Promise.all(
     ['.photo', '.hello', '.projects', '.skills', '.experience', '.education', '.contacts'].map(async (s) => (await page.locator(s).boundingBox())!.y),
   );
@@ -180,7 +193,7 @@ test('on a phone the blocks stack: picture, hello, projects, skills, experience,
 });
 
 test('the site is white and has no theme switcher', async ({ page }) => {
-  await page.goto('/');
+  await open(page, '/');
   const [r, g, b] = (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).match(/\d+/g)!.map(Number);
   expect(Math.min(r!, g!, b!)).toBeGreaterThan(215);
   await expect(page.locator('[data-theme-option]')).toHaveCount(0);
