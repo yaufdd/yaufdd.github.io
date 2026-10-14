@@ -43,9 +43,10 @@ const story = (image: SchemaContext['image']) =>
     }),
     before: flow.optional(),
     after: flow,
-    /** Screenshots shown right after "before and now", with no heading: one caption for all. */
+    /** Screenshots with no heading, one caption for all: under the summary (top) or after "before and now" (middle). */
     screens: z
       .object({
+        at: z.enum(['top', 'middle']).default('middle'),
         caption: z.string().min(1).max(60),
         items: z.array(z.object({ image: image(), alt: z.string().min(1) })).min(1).max(4),
       })

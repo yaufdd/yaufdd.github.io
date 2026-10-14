@@ -16,7 +16,7 @@ for (const locale of ['ja', 'en'] as const) {
     ]);
     await expect(page.locator('#story-change .flow')).toHaveCount(2);
     await expect(page.locator('#story-change .flow.after li.aside')).toHaveCount(1);
-    await expect(page.locator('.story > figure.screens img')).toHaveCount(2);
+    await expect(page.locator('#story-cover figure.screens img')).toHaveCount(2);
     await expect(page.locator('#story-highlights li')).toHaveCount(3);
     await expect(page.locator('#story-outcome [data-avatar]')).toHaveCount(1);
   });
@@ -26,3 +26,13 @@ for (const locale of ['ja', 'en'] as const) {
     expect((await page.content()).toLowerCase()).not.toContain('fuji');
   });
 }
+
+test('the screens sit right under the summary, so they are the first thing you see', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/projects/estimate-versions/');
+  const next = await page.locator('#story-cover .lead').evaluate((el) => el.nextElementSibling?.matches('figure.screens'));
+  expect(next, 'the figure follows the summary').toBe(true);
+  await expect(page.locator('#story-cover figure.screens')).toBeInViewport({ ratio: 0.9 });
+  await expect(page.locator('#story-cover figure.screens img[src*="quote-diff"]')).toBeVisible();
+  await expect(page.locator('.story > figure.screens')).toHaveCount(0);
+});

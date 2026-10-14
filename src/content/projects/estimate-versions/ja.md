@@ -28,6 +28,7 @@ story:
     result: { icon: git-compare, title: "変更点が一目で", note: "変更・取消・確定を色分け", from: 1 }
     note: "画面は GitHub を参考にしました。見積書がリポジトリ、版がコミットのイメージですが、そうした用語は画面に出していません。"
   screens:
+    at: top
     caption: "画面の例"
     items:
       - { image: "./images/quote-diff.png", alt: "見積書の画面：版の比較で変更・取消・確定のセルを色分け（テストデータ）" }

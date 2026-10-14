@@ -1,0 +1,48 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../../lib/content';
+
+type Screens = NonNullable<NonNullable<Project['data']['story']>['screens']>;
+
+interface Props {
+  screens: Screens;
+}
+const { screens } = Astro.props;
+---
+{/* Example screens: no heading, just the pictures (click to enlarge in the screenshot viewer) and one caption. */}
+<figure class:list={['screens', screens.at]} data-lightbox>
+  <div class="shots">
+    {screens.items.map((shot) => <Image src={shot.image} alt={shot.alt} widths={[480, 960, 1600]} sizes="(min-width: 1100px) 520px, 100vw" />)}
+  </div>
+  <figcaption>{screens.caption}</figcaption>
+</figure>
+
+<style>
+  .screens {
+    margin: 0;
+  }
+  .screens.middle {
+    padding: 8px 0 56px;
+  }
+  .screens.top {
+    margin: 10px 0 6px;
+  }
+  .shots {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .shots :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 10px 24px rgb(0 0 0 / 0.06);
+  }
+  figcaption {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>

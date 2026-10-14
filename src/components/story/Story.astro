@@ -7,6 +7,7 @@ import { localizePath, t } from '../../i18n/utils';
 import { slugOf, type Project } from '../../lib/content';
 import Flow from './Flow.astro';
 import Icon from './Icon.astro';
+import Screens from './Screens.astro';
 
 interface Props {
   locale: Locale;
@@ -29,6 +30,7 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     <p class="crumb">~/projects/{slug}</p>
     <h1 id="story-title" class="page-title">{data.title}{data.subtitle && <small>{data.subtitle}</small>}</h1>
     <p class="lead">{data.summary}</p>
+    {story.screens?.at === 'top' && <Screens screens={story.screens} />}
     <CaseMeta locale={locale} data={data} />
   </section>
 
@@ -86,18 +88,7 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     </div>
   </section>
 
-  {
-    story.screens && (
-      <figure class="screens" data-lightbox>
-        <div class="shots">
-          {story.screens.items.map((shot) => (
-            <Image src={shot.image} alt={shot.alt} widths={[480, 960, 1600]} sizes="(min-width: 1100px) 520px, 100vw" />
-          ))}
-        </div>
-        <figcaption>{story.screens.caption}</figcaption>
-      </figure>
-    )
-  }
+  {story.screens?.at === 'middle' && <Screens screens={story.screens} />}
 
   <section id="story-architecture" aria-labelledby="story-architecture-title">
     <h2 id="story-architecture-title">{t(locale, 'story.architecture')}</h2>
@@ -172,7 +163,7 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     padding: 56px 0;
   }
   .story > section + section,
-  .story > figure + section {
+  .story > :global(figure) + section {
     border-top: 1px solid var(--border);
   }
   h2 {
@@ -286,30 +277,6 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     .example {
       width: min(220px, 60%);
     }
-  }
-
-  /* Example screens: no heading, just the pictures (click to enlarge) and one caption. */
-  .screens {
-    margin: 0;
-    padding: 8px 0 56px;
-  }
-  .shots {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-  .shots :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 10px 24px rgb(0 0 0 / 0.06);
-  }
-  .screens figcaption {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: 13px;
   }
 
   /* Before and now: two rows in one section. */

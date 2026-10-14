@@ -28,6 +28,7 @@ story:
     result: { icon: git-compare, title: "Changes at a glance", note: "changed, cancelled and confirmed in colour", from: 1 }
     note: "The interface borrows from GitHub — quotes are like repositories and versions like commits — without showing any of those words."
   screens:
+    at: top
     caption: "Example screens"
     items:
       - { image: "./images/quote-diff.png", alt: "A quote compared with its previous version: changed, cancelled and confirmed cells in colour (test data)" }
