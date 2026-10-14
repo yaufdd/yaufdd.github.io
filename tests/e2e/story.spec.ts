@@ -33,6 +33,30 @@ for (const locale of ['ja', 'en'] as const) {
   });
 }
 
+for (const locale of ['ja', 'en'] as const) {
+  const url = locale === 'ja' ? '/projects/visa-docs/' : '/en/projects/visa-docs/';
+  const DOCS = {
+    ja: { must: ['査証申請書', '委任状', 'スポンサーレター', '滞在予定表'], note: ['約 10 個', '手作業'], source: '外務省' },
+    en: { must: ['Visa application form', 'Power of attorney', 'Sponsor letter', 'Schedule of stay'], note: ['about 10', 'by hand'], source: 'Ministry of Foreign Affairs' },
+  }[locale];
+
+  test(`${locale}: the problem lists the documents made for each traveller, with the official form as an example`, async ({ page }) => {
+    await page.goto(url);
+    const docs = page.locator('#story-task .docs');
+    const items = await docs.locator('li').allTextContents();
+    expect(items.length).toBeGreaterThanOrEqual(6);
+    for (const name of DOCS.must) expect(items.some((i) => i.includes(name)), name).toBe(true);
+    for (const words of DOCS.note) await expect(docs.locator('.docs-note')).toContainText(words);
+    const example = docs.locator('figure.example');
+    await expect(example.locator('img')).toBeVisible();
+    await expect(example.locator('img')).toHaveAttribute('alt', /.+/);
+    await expect(example.locator('a')).toHaveAttribute('href', 'https://www.mofa.go.jp/mofaj/files/000124525.pdf');
+    await expect(example.locator('figcaption')).toContainText(DOCS.source);
+    // The embassy page was only the source of the list: it is not linked.
+    await expect(page.locator('a[href*="emb-japan"]')).toHaveCount(0);
+  });
+}
+
 test('before: traveller → staff → about 10 documents in one row, with the pain spelled out', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/en/projects/visa-docs/');
@@ -104,7 +128,7 @@ test('it is one continuous page: no snapping, no slide dots, sections only as ta
   await page.goto('/projects/visa-docs/');
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType)).toMatch(/^(none)?$/);
   await expect(page.locator('.deck-dots, .story-dots')).toHaveCount(0);
-  for (const id of ['task', 'outcome']) {
+  for (const id of ['outcome']) {
     const { height } = (await page.locator(`#story-${id}`).boundingBox())!;
     expect(height, id).toBeLessThan(600);
   }

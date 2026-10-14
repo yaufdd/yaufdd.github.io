@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import CaseMeta from '../CaseMeta.astro';
 import type { Locale } from '../../i18n/ui';
 import { localizePath, t } from '../../i18n/utils';
@@ -17,6 +18,7 @@ const { data } = entry;
 const story = data.story!;
 const slug = slugOf(entry);
 // `**…**` in the problem text marks the bold bits: odd-numbered parts.
+const docs = story.task.documents;
 const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
 ---
 {/* A case study told visually on one continuous page: short sections with cards, arrows and numbers. */}
@@ -32,6 +34,32 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
   <section id="story-task" aria-labelledby="story-task-title">
     <h2 id="story-task-title">{t(locale, 'story.task')}</h2>
     <p class="statement">{taskParts.map((part, i) => (i % 2 ? <strong>{part}</strong> : part))}</p>
+    {
+      docs && (
+        <div class="docs">
+          <div>
+            <h3>{docs.title}</h3>
+            <ul>
+              {docs.items.map((item) => (
+                <li>
+                  <Icon name="file-text" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            {docs.note && <p class="docs-note">{docs.note}</p>}
+          </div>
+          {docs.example && (
+            <figure class="example">
+              <a href={docs.example.href} target="_blank" rel="noopener">
+                <Image src={docs.example.image} alt={docs.example.alt} widths={[220, 440]} sizes="220px" />
+              </a>
+              <figcaption>{docs.example.caption}</figcaption>
+            </figure>
+          )}
+        </div>
+      )
+    }
   </section>
 
   <section id="story-change" aria-labelledby="story-change-title">
@@ -180,6 +208,69 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
   }
   .statement strong {
     font-weight: 800;
+  }
+  /* The paperwork: a plain list of the documents, and one real form as an example. */
+  .docs {
+    display: grid;
+    gap: 28px;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .docs {
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 48px;
+    }
+  }
+  .docs ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 8px 24px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .docs li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+  }
+  .docs li :global(.icon) {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--muted);
+  }
+  .docs-note {
+    margin: 16px 0 0;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .example {
+    margin: 0;
+  }
+  .example a {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 8px 20px rgb(0 0 0 / 0.06);
+  }
+  .example :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .example figcaption {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  @media (max-width: 899px) {
+    .example {
+      width: min(220px, 60%);
+    }
   }
 
   /* Before and now: two rows in one section. */

@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { ICON_NAMES } from './components/story/icons';
@@ -26,15 +26,27 @@ const flow = z
   })
   .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' })
   .refine((f) => !f.aside || f.aside.to < f.steps.length, { message: 'aside.to must point at one of the steps' });
-const story = z.object({
-  /** `**…**` marks the words shown in bold (the times saved). */
-  task: z.object({ text: z.string().min(1).max(220) }),
-  before: flow.optional(),
-  after: flow,
-  architecture: z.object({ layers: z.array(card).min(1).max(4), leaves: z.array(card).min(1).max(4), note: z.string().min(1).max(140).optional() }),
-  highlights: z.array(z.object({ title: z.string().min(1).max(32), text: z.string().min(1).max(100) })).min(2).max(6),
-  outcome: z.array(z.string().min(1).max(100)).min(1).max(3),
-});
+const story = (image: SchemaContext['image']) =>
+  z.object({
+    task: z.object({
+      /** `**…**` marks the words shown in bold (the times saved). */
+      text: z.string().min(1).max(220),
+      /** The paperwork behind the problem: the documents made for each traveller, and one official form as an example. */
+      documents: z
+        .object({
+          title: z.string().min(1).max(40),
+          items: z.array(z.string().min(1).max(48)).min(2).max(12),
+          note: z.string().min(1).max(160).optional(),
+          example: z.object({ image: image(), alt: z.string().min(1), caption: z.string().min(1).max(80), href: z.url() }).optional(),
+        })
+        .optional(),
+    }),
+    before: flow.optional(),
+    after: flow,
+    architecture: z.object({ layers: z.array(card).min(1).max(4), leaves: z.array(card).min(1).max(4), note: z.string().min(1).max(140).optional() }),
+    highlights: z.array(z.object({ title: z.string().min(1).max(32), text: z.string().min(1).max(100) })).min(2).max(6),
+    outcome: z.array(z.string().min(1).max(100)).min(1).max(3),
+  });
 
 const projects = defineCollection({
   loader: glob({ pattern: '*/{ja,en}.md', base: './src/content/projects' }),
@@ -56,7 +68,7 @@ const projects = defineCollection({
       coverAlt: z.string().min(1),
       order: z.number().int(),
       draft: z.boolean().default(false),
-      story: story.optional(),
+      story: story(image).optional(),
     }),
 });
 

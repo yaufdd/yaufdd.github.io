@@ -14,6 +14,18 @@ order: 1
 story:
   task:
     text: "Visa paperwork was put together by hand from scans, about **60 minutes** per traveller. With the system it takes **15 minutes**: a 30-person tour goes from **30 hours to 7.5 hours**."
+    documents:
+      title: "Documents for one traveller, for example"
+      items:
+        - "Visa application form (2 copies, with photo)"
+        - "Schedule of stay"
+        - "Power of attorney (when submitted by a proxy)"
+        - "Sponsor letter (for minors)"
+        - "Letter for a multiple-entry visa"
+        - "Visa centre application"
+        - "Submission checklist"
+      note: "Depending on the traveller's situation, one person can need about 10 PDF and Word files — and all of them were made by hand."
+      example: { image: "./images/visa-application-form.png", alt: "Visa application form of the Ministry of Foreign Affairs of Japan, page 1", caption: "Example: visa application form (source: Ministry of Foreign Affairs of Japan)", href: "https://www.mofa.go.jp/mofaj/files/000124525.pdf" }
   before:
     steps:
       - { icon: pen-line, title: "Traveller", note: "fills in a Word form by hand" }

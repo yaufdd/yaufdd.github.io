@@ -19,7 +19,7 @@ interface Flow {
   note?: string;
 }
 interface Story {
-  task: { text: string };
+  task: { text: string; documents?: { title: string; items: string[]; note?: string; example?: { image: string; href: string } } };
   before?: Flow;
   after: Flow;
   architecture: { layers: Card[]; leaves: Card[]; note?: string };
@@ -46,6 +46,7 @@ const shape = (story: Story) => {
   return {
     /** The **bold** bits (the times) carry the same numbers in both languages. */
     bold: [...story.task.text.matchAll(/\*\*(.+?)\*\*/g)].map((m) => m[1]!.match(/[0-9.]+/g)),
+    documents: story.task.documents && [story.task.documents.items.length, Boolean(story.task.documents.note), story.task.documents.example?.image, story.task.documents.example?.href],
     before: flow(story.before),
     after: flow(story.after),
     architecture: [story.architecture.layers.map((c) => c.icon), story.architecture.leaves.map((c) => c.icon), Boolean(story.architecture.note)],
