@@ -25,9 +25,7 @@ const next = projects.length > 1 ? projects[(at + 1) % projects.length] : undefi
 <Base locale={locale} path={`projects/${slug}/`} title={data.title} description={data.summary} ogImage={data.cover}>
   {
     data.story ? (
-      <Story locale={locale} entry={entry} next={next}>
-        <Content />
-      </Story>
+      <Story locale={locale} entry={entry} next={next} />
     ) : (
       <article class="container case">
         <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>

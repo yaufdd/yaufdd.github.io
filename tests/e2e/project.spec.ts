@@ -1,10 +1,10 @@
 import { expect, test } from './fixtures';
 
 const PAGES = [
-  { url: '/projects/visa-docs/', lang: 'ja', h1: 'ビザ申請書類 自動生成システム', other: '/en/projects/visa-docs/' },
-  { url: '/en/projects/visa-docs/', lang: 'en', h1: 'Visa Document Automation', other: '/projects/visa-docs/' },
-  { url: '/projects/pacxpuctanno/', lang: 'ja', h1: 'pacxpuctanno', other: '/en/projects/pacxpuctanno/' },
-  { url: '/en/projects/pacxpuctanno/', lang: 'en', h1: 'pacxpuctanno', other: '/projects/pacxpuctanno/' },
+  { url: '/projects/visa-docs/', lang: 'ja', h1: 'ビザ申請書類 自動生成システム', other: '/en/projects/visa-docs/', story: true },
+  { url: '/en/projects/visa-docs/', lang: 'en', h1: 'Visa Document Automation', other: '/projects/visa-docs/', story: true },
+  { url: '/projects/pacxpuctanno/', lang: 'ja', h1: 'pacxpuctanno', other: '/en/projects/pacxpuctanno/', story: false },
+  { url: '/en/projects/pacxpuctanno/', lang: 'en', h1: 'pacxpuctanno', other: '/projects/pacxpuctanno/', story: false },
 ] as const;
 
 for (const p of PAGES) {
@@ -13,7 +13,9 @@ for (const p of PAGES) {
     await expect(page.locator('html')).toHaveAttribute('lang', p.lang);
     await expect(page.locator('h1')).toContainText(p.h1);
     await expect(page.locator('.meta dl')).toBeVisible();
-    await expect(page.locator('.prose h2')).toHaveCount(5);
+    // A case told as a visual story has its sections; an article has the five Markdown sections.
+    if (p.story) await expect(page.locator('.story > section')).toHaveCount(6);
+    else await expect(page.locator('.prose h2')).toHaveCount(5);
   });
 
   test(`${p.url} language switch opens its translation`, async ({ page }) => {

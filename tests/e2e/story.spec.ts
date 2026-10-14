@@ -176,14 +176,11 @@ test('on opening, the page stays at the very top: the header and its language sw
   await expect(page.locator('.lang a[hreflang="en"]')).toBeInViewport();
 });
 
-test('“Read more” is folded and holds the full case text', async ({ page }) => {
+test('there is no “Read more”: the page ends with the outcome', async ({ page }) => {
   await page.goto('/projects/visa-docs/');
-  const more = page.locator('details.more');
-  await expect(more).not.toHaveAttribute('open');
-  await expect(more.locator('.prose h2').first()).toBeHidden();
-  await more.locator('summary').click();
-  await expect(more.locator('.prose h2').first()).toBeVisible();
-  await expect(more.locator('.prose h2')).toHaveCount(5);
+  await expect(page.locator('details')).toHaveCount(0);
+  await expect(page.locator('.prose')).toHaveCount(0);
+  expect(await page.locator('.story > *').last().getAttribute('id')).toBe('story-outcome');
 });
 
 test('on a phone the flow runs top to bottom', async ({ page }) => {

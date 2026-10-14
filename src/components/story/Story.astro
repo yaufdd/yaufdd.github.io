@@ -22,7 +22,7 @@ const slug = slugOf(entry);
 const docs = story.task.documents;
 const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
 ---
-{/* A case study told visually on one continuous page: short sections with cards, arrows and numbers. */}
+{/* A case study told visually on one continuous page: short sections with cards, arrows and numbers. Nothing else: the Markdown body of a story project stays empty. */}
 <div class="story">
   <section class="cover" id="story-cover" aria-labelledby="story-title">
     <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>
@@ -144,11 +144,6 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
       <div class="figure"><Avatar3D label={t(locale, 'home.avatarAlt')} /></div>
     </div>
   </section>
-
-  <details class="more">
-    <summary>{t(locale, 'story.readMore')}</summary>
-    <div class="prose"><slot /></div>
-  </details>
 </div>
 
 
@@ -499,14 +494,4 @@ const taskParts = story.task.text.split(/\*\*(.+?)\*\*/);
     opacity: 0.6;
   }
 
-  /* Read more */
-  .more {
-    margin-top: 24px;
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
-  }
-  .more summary {
-    cursor: pointer;
-    font-weight: 800;
-  }
 </style>

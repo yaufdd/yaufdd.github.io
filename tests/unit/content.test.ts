@@ -19,9 +19,17 @@ it('there are projects to check', () => {
   expect(slugs.length).toBeGreaterThan(0);
 });
 
+/** A case told as a visual story (frontmatter `story:`) shows no Markdown body; an article is its body. */
+const isStory = (md: string) => /^story:/m.test(md.split(/\r?\n---/)[0] ?? '');
+
 describe.each(slugs)('project %s', (slug) => {
-  it.each(['ja', 'en'] as const)('%s.md has exactly the five case sections in order', (locale) => {
-    const headings = [...body(read(slug, locale)).matchAll(/^## (.+)$/gm)].map((m) => (m[1] ?? '').trim());
+  it.each(['ja', 'en'] as const)('%s.md: an article has exactly the five case sections in order; a story has no body', (locale) => {
+    const md = read(slug, locale);
+    if (isStory(md)) {
+      expect(body(md).trim(), 'nothing would show this text').toBe('');
+      return;
+    }
+    const headings = [...body(md).matchAll(/^## (.+)$/gm)].map((m) => (m[1] ?? '').trim());
     expect(headings).toEqual([...SECTIONS[locale]]);
   });
   it('ja.md and en.md show the same screenshots', () => {
