@@ -11,6 +11,9 @@ devProcess: Built with Claude Code in a "spec → implementation plan → TDD �
 cover: ./images/cover.png
 coverAlt: "~/projects/inquiry-hub — terminal-style cover image"
 order: 3
+group: travel
+thumbnail: ./images/hub-request.png
+thumbnailAlt: "A request: client, manager and status, with its history of changes (mock data)"
 story:
   task:
     text: "Inquiries came in by email, WhatsApp, Telegram and the website form. Keeping track of who was handling which one, and how far each had got, was hard, and so was keeping them in order."

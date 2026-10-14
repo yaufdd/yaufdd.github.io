@@ -14,9 +14,8 @@ async function open(page: Page, url: string) {
 
 const ROOT = 'src/content/projects';
 
-/** Project links the home page should show, derived from the content files so new projects need no test changes. */
-function expectedProjectLinks(locale: 'ja' | 'en'): string[] {
-  const prefix = locale === 'ja' ? '/' : '/en/';
+/** Published projects in home page order, with their group, derived from the content files. */
+function publishedProjects(locale: 'ja' | 'en'): { slug: string; group: string }[] {
   return readdirSync(ROOT, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => {
@@ -24,13 +23,28 @@ function expectedProjectLinks(locale: 'ja' | 'en'): string[] {
       const own = frontmatter(locale);
       return {
         slug: d.name,
+        group: /^group:\s*(\w+)/m.exec(own)?.[1] ?? '',
         order: Number(/^order:\s*(-?\d+)/m.exec(own)?.[1]),
         draft: ['ja', 'en'].some((l) => /^draft:\s*true/m.test(frontmatter(l))),
       };
     })
     .filter((p) => !p.draft)
-    .sort((a, b) => a.order - b.order || a.slug.localeCompare(b.slug))
-    .map((p) => `${prefix}projects/${p.slug}/`);
+    .sort((a, b) => a.order - b.order || a.slug.localeCompare(b.slug));
+}
+
+/**
+ * Links in the home page's project list: the travel company's projects as one entry (to their part of the
+ * projects page), each personal project, the workflow, and the button to the projects page.
+ */
+function expectedProjectLinks(locale: 'ja' | 'en'): string[] {
+  const prefix = locale === 'ja' ? '/' : '/en/';
+  const projects = publishedProjects(locale);
+  return [
+    ...(projects.some((p) => p.group === 'travel') ? [`${prefix}projects/#travel`] : []),
+    ...projects.filter((p) => p.group !== 'travel').map((p) => `${prefix}projects/${p.slug}/`),
+    `${prefix}about/#workflow`,
+    `${prefix}projects/`,
+  ];
 }
 
 const HEADINGS = {
@@ -91,7 +105,7 @@ for (const size of [
     await page.setViewportSize(size);
     for (const url of ['/', '/en/']) {
       await open(page, url);
-      const lines = await page.locator('.projects a span').evaluateAll((els) =>
+      const lines = await page.locator('.projects li span').evaluateAll((els) =>
         els.map((e) => e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight)),
       );
       expect(lines.length).toBeGreaterThan(0);
@@ -128,19 +142,19 @@ for (const locale of ['ja', 'en'] as const) {
     await expect(page.locator('.hello img')).toHaveCount(0);
   });
 
-  test(`${locale}: the projects section links to every project and the workflow, each with a description`, async ({ page }) => {
+  test(`${locale}: the projects section groups the travel company's work, lists the rest, and ends with a button to all projects`, async ({ page }) => {
     await open(page, home);
     const expected = expectedProjectLinks(locale);
-    expect(expected.length).toBeGreaterThan(0);
-    const links = page.locator('.projects a');
-    expect(await links.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual([
-      ...expected,
-      locale === 'ja' ? '/about/#workflow' : '/en/about/#workflow',
-    ]);
-    for (const text of await page.locator('.projects a span').allTextContents()) expect(text.trim()).not.toBe('');
-    await expect(page.locator('.projects a span')).toHaveCount(expected.length + 1);
-    await links.first().click();
-    await expect(page).toHaveURL(expected[0]!);
+    expect(await page.locator('.projects a').evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual(expected);
+    const travel = page.locator('.projects li.group');
+    await expect(travel.locator('b')).toHaveText(locale === 'ja' ? '旅行会社のプロジェクト' : 'Projects at a travel company');
+    await expect(travel.locator('span')).toHaveText(locale === 'ja' ? '社内システム 3 件' : '3 internal systems');
+    await expect(travel.locator('a')).toHaveText(locale === 'ja' ? '詳しく見る →' : 'See details →');
+    const button = page.locator('.projects a.all');
+    await expect(button).toHaveText(locale === 'ja' ? 'すべてのプロジェクトを見る' : 'See all projects');
+    await button.click();
+    await expect(page).toHaveURL(expected.at(-1)!);
+    await expect(page.locator('h1')).toHaveText(locale === 'ja' ? 'プロジェクト' : 'Projects');
   });
 
   test(`${locale}: skills, experience, education and contacts`, async ({ page }) => {
@@ -199,4 +213,20 @@ test('the site is white and has no theme switcher', async ({ page }) => {
   await expect(page.locator('[data-theme-option]')).toHaveCount(0);
   await page.goto('/projects/visa-docs/');
   await expect(page.locator('[data-theme-option]')).toHaveCount(0);
+});
+
+test('on a laptop window too short for one screen, the same layout scrolls a little and nothing overlaps', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await open(page, '/');
+  // Same three-column layout as on a taller screen, just scrolling a little.
+  const [photo, hello] = await Promise.all(['.photo', '.hello'].map(async (sel) => (await page.locator(sel).boundingBox())!));
+  expect(hello!.x, 'greeting beside the picture').toBeGreaterThan(photo!.x + photo!.width);
+  const blocks = ['.photo', '.hello', '.projects', '.skills', '.experience', '.education', '.contacts'];
+  const boxes = await Promise.all(blocks.map(async (s) => ({ s, box: (await page.locator(s).boundingBox())! })));
+  const overlaps = boxes.flatMap((a, i) =>
+    boxes.slice(i + 1).filter((b) => a.box.x < b.box.x + b.box.width && b.box.x < a.box.x + a.box.width && a.box.y < b.box.y + b.box.height && b.box.y < a.box.y + a.box.height).map((b) => `${a.s} × ${b.s}`),
+  );
+  expect(overlaps).toEqual([]);
+  await page.locator('.projects a.all').click();
+  await expect(page).toHaveURL('/projects/');
 });

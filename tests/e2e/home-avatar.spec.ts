@@ -64,8 +64,16 @@ test('the still image looks like the live 3D figure, so swapping one for the oth
     return figure.screenshot();
   };
   const empty = await show(0, 0);
-  const live = await figureLook(page, empty, await show(1, 0));
   const still = await figureLook(page, empty, await show(0, 1));
+  // The live figure blinks (eyes shut for ~0.13 s) and sways, so take three samples 300 ms apart and keep the
+  // closest: a blink never spans all three.
+  const lives = [];
+  for (let i = 0; i < 3; i++) {
+    lives.push(await figureLook(page, empty, await show(1, 0)));
+    await page.waitForTimeout(300);
+  }
+  const worstChannel = (look: { rgb: number[] }) => Math.max(...look.rgb.map((v, c) => Math.abs(v - still.rgb[c]!)));
+  const live = lives.reduce((best, look) => (worstChannel(look) < worstChannel(best) ? look : best));
   // Measured: live vs a still from the same camera and light differ by < 2 per channel; the old Blender still by ~25.
   for (let c = 0; c < 3; c++) expect(Math.abs(live.rgb[c]! - still.rgb[c]!), `channel ${c}: live ${live.rgb} vs still ${still.rgb}`).toBeLessThan(5);
   expect(still.area / live.area).toBeGreaterThan(0.93);

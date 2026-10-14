@@ -76,6 +76,11 @@ const projects = defineCollection({
       coverAlt: z.string().min(1),
       order: z.number().int(),
       draft: z.boolean().default(false),
+      /** Where it was built: for the travel company (shown together on the home page) or on my own. */
+      group: z.enum(['travel', 'personal']),
+      /** Picture on the projects page; story projects default to their first screen. */
+      thumbnail: image().optional(),
+      thumbnailAlt: z.string().min(1).optional(),
       story: story(image).optional(),
     }),
 });

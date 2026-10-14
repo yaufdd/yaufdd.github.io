@@ -11,6 +11,7 @@ devProcess: Built with Claude Code in a "spec → implementation plan → TDD �
 cover: ./images/cover.png
 coverAlt: "~/projects/estimate-versions — terminal-style cover image"
 order: 2
+group: travel
 story:
   task:
     text: "Staff built quotes in Excel, and every revision added another file. Which one was the latest, and what had changed since the last version, could only be found by opening the files and comparing them by eye."

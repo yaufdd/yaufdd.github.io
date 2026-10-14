@@ -14,8 +14,12 @@ interface Props {
 }
 const { locale } = Astro.props;
 const projects = await getProjects(locale);
+// The travel company's systems show as one entry; personal projects and the workflow are listed one by one.
+const travel = projects.filter((p) => p.data.group === 'travel');
 const links = [
-  ...projects.map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title, tagline: p.data.tagline })),
+  ...projects
+    .filter((p) => p.data.group !== 'travel')
+    .map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title, tagline: p.data.tagline })),
   { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'home.workflowLink'), tagline: t(locale, 'home.workflowTagline') },
 ];
 ---
@@ -35,6 +39,15 @@ const links = [
       <h2 id="projects-title">{t(locale, 'home.projects')}</h2>
       <ul>
         {
+          travel.length > 0 && (
+            <li class="group">
+              <b>{t(locale, 'home.travelProjects')}</b>
+              <span>{t(locale, 'home.travelCount', { n: travel.length })}</span>
+              <a href={localizePath(locale, 'projects/#travel')}>{t(locale, 'home.seeDetails')}</a>
+            </li>
+          )
+        }
+        {
           links.map((link) => (
             <li>
               <a href={link.href}>
@@ -45,6 +58,7 @@ const links = [
           ))
         }
       </ul>
+      <a class="all" href={localizePath(locale, 'projects/')}>{t(locale, 'home.allProjects')}</a>
     </section>
 
     <section class="skills" data-reveal style="--i: 3" aria-labelledby="skills-title">
@@ -202,6 +216,37 @@ const links = [
     font-size: 12px;
     line-height: 1.6;
   }
+  /* The travel company's systems as one entry: a title, how many, and a link to their part of the projects page. */
+  .projects .group {
+    display: grid;
+    justify-items: start;
+    gap: 2px;
+  }
+  .projects .group b {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .projects .group a {
+    display: inline;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .projects a.all {
+    display: inline-flex;
+    margin-top: 14px;
+    padding: 7px 16px;
+    border: 1.5px solid var(--fg);
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .projects a.all:hover {
+    background: var(--fg);
+    color: #fff;
+    opacity: 1;
+  }
   .degree {
     margin-bottom: 14px;
     font-weight: 800;
@@ -288,8 +333,17 @@ const links = [
     justify-self: center;
   }
 
-  /* Laptops and up: the reference layout on exactly one screen. */
-  @media (min-width: 1100px) and (min-height: 700px) {
+  /*
+   * Laptops and up: the reference layout. When the window is tall enough it fills exactly one screen; on a shorter
+   * window (a 1280×720 laptop) the same layout simply grows and the page scrolls a little, rather than clipping.
+   */
+  @media (min-width: 1100px) and (min-height: 770px) {
+    .sheet {
+      height: 100dvh;
+      overflow: hidden;
+    }
+  }
+  @media (min-width: 1100px) and (min-height: 600px) {
     .sheet {
       position: relative;
       grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(0, 1fr);
@@ -300,9 +354,8 @@ const links = [
         'contacts contacts contacts';
       gap: 0 40px;
       max-width: 1240px;
-      height: 100dvh;
+      min-height: 100dvh;
       padding: 44px 0 40px 44px;
-      overflow: hidden;
     }
     /* Square, exactly the picture, its top level with the greeting; education takes the space under it. */
     .photo {

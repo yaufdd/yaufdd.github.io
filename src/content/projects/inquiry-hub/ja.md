@@ -11,6 +11,9 @@ devProcess: Claude Code で「仕様 → 実装計画 → TDD → レビュー�
 cover: ./images/cover.png
 coverAlt: "~/projects/inquiry-hub — ターミナル風のカバー画像"
 order: 3
+group: travel
+thumbnail: ./images/hub-request.png
+thumbnailAlt: "問い合わせの画面：顧客・担当者・ステータスと、変更の履歴（ダミーデータ）"
 story:
   task:
     text: "問い合わせは、メール、WhatsApp、Telegram、サイトのフォームなど、いろいろな経路から届いていました。どれに誰が対応していて、どこまで進んだのかを追うのが難しく、整理するのも大変でした。"

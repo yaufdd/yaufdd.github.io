@@ -11,6 +11,7 @@ devProcess: Built with Claude Code in a spec → plan → TDD → review loop.
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — terminal-style cover image"
 order: 1
+group: travel
 story:
   task:
     text: "Visa paperwork was made by hand from scans: about **60 minutes** per traveller. Now it takes **15 minutes**, and even a 30-person tour gets all its documents at once, as soon as everyone has filled in the form."

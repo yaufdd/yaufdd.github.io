@@ -11,6 +11,7 @@ devProcess: Claude Code で「仕様 → 実装計画 → TDD → レビュー�
 cover: ./images/cover.png
 coverAlt: "~/projects/estimate-versions — ターミナル風のカバー画像"
 order: 2
+group: travel
 story:
   task:
     text: "見積書は担当者が Excel で作り、修正のたびに新しいファイルが増えていきました。どれが最新で、前の版から何が変わったのかは、ファイルを開いて目で比べるしかありませんでした。"

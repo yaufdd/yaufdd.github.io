@@ -1,0 +1,149 @@
+---
+import { Image } from 'astro:assets';
+import type { Locale } from '../i18n/ui';
+import { localizePath, t } from '../i18n/utils';
+import Base from '../layouts/Base.astro';
+import { getProjects, slugOf, type Project } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const projects = await getProjects(locale);
+const groups = [
+  { id: 'travel', title: t(locale, 'projects.travel'), note: t(locale, 'projects.travelNote'), items: projects.filter((p) => p.data.group === 'travel') },
+  { id: 'personal', title: t(locale, 'projects.personal'), note: undefined, items: projects.filter((p) => p.data.group === 'personal') },
+].filter((g) => g.items.length > 0);
+
+/** The card picture: the project's own thumbnail, else its first screen, else its cover. */
+const picture = (p: Project) => {
+  if (p.data.thumbnail) return { src: p.data.thumbnail, alt: p.data.thumbnailAlt ?? p.data.title };
+  const shot = p.data.story?.screens?.items[0];
+  if (shot) return { src: shot.image, alt: shot.alt };
+  return { src: p.data.cover, alt: p.data.coverAlt };
+};
+---
+<Base locale={locale} path="projects/" title={t(locale, 'projects.title')} description={t(locale, 'projects.description')}>
+  <div class="container page">
+    <a class="back mono" href={localizePath(locale, '')}>{t(locale, 'project.back')}</a>
+    <p class="crumb">~/projects</p>
+    <h1 class="page-title">{t(locale, 'projects.title')}</h1>
+
+    {
+      groups.map((group) => (
+        <section id={group.id} class="group" aria-labelledby={`${group.id}-title`}>
+          <h2 id={`${group.id}-title`}>{group.title}</h2>
+          {group.note && <p class="note">{group.note}</p>}
+          <ul class="cards">
+            {group.items.map((p) => {
+              const pic = picture(p);
+              return (
+                <li class="card">
+                  <a href={localizePath(locale, `projects/${slugOf(p)}/`)}>
+                    <Image src={pic.src} alt={pic.alt} widths={[480, 800]} sizes="(min-width: 900px) 480px, 100vw" />
+                    <div class="body">
+                      <h3>{p.data.title} →</h3>
+                      <p>{p.data.summary}</p>
+                      <ul class="tags">
+                        {p.data.stack.slice(0, 6).map((item) => (
+                          <li>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-bottom: 64px;
+  }
+  .back {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .back:hover {
+    color: var(--fg);
+  }
+  .group {
+    margin-top: 48px;
+    scroll-margin-top: 24px;
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 900;
+  }
+  .note {
+    max-width: 46em;
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card a {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--fg);
+    text-decoration: none;
+    transition:
+      box-shadow 0.2s,
+      transform 0.2s;
+  }
+  .card a:hover {
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 12px 28px rgb(0 0 0 / 0.08);
+    transform: translateY(-2px);
+  }
+  .card :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top left;
+    border-bottom: 1px solid var(--border);
+  }
+  .body {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 16px 18px 18px;
+  }
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+  }
+  .body p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .tags {
+    margin-top: 4px;
+  }
+</style>

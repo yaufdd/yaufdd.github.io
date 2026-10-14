@@ -7,6 +7,8 @@ test('blocks fade in and end up fully visible', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveClass(/\bmotion\b/);
   await expect(page.locator('.hello')).toHaveCSS('opacity', '1');
+  // Lower blocks fade in as they scroll into view (on a short window the page scrolls).
+  await page.locator('.contacts').scrollIntoViewIfNeeded();
   await expect(page.locator('.contacts')).toHaveCSS('opacity', '1');
 });
 

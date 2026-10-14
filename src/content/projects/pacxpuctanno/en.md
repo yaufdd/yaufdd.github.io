@@ -13,6 +13,9 @@ devProcess: Spec and implementation plan written with Claude Code before coding 
 cover: ./images/cover.png
 coverAlt: "~/projects/pacxpuctanno — terminal-style cover image"
 order: 4
+group: personal
+thumbnail: ./images/01-home.png
+thumbnailAlt: "Home page: hero carousel and the new drop"
 ---
 
 ## Problem

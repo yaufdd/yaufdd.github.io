@@ -11,6 +11,7 @@ devProcess: Claude Code で「仕様 → 実装計画 → TDD → レビュー�
 cover: ./images/cover.png
 coverAlt: "~/projects/visa-docs — ターミナル風のカバー画像"
 order: 1
+group: travel
 story:
   task:
     text: "ビザ申請の書類は、担当者がスキャンを見ながら手で作っていて、1 人あたり約 **60 分** かかっていました。システムを入れてからは **15 分** です。30 人のツアーでも、全員の入力がそろった時点でツアー全員分の書類がまとめて生成されるので、人数が増えても待ち時間はほとんど変わりません。"

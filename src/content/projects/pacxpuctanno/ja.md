@@ -13,6 +13,9 @@ devProcess: Claude Code で仕様書と実装計画を書いてから実装（sp
 cover: ./images/cover.png
 coverAlt: "~/projects/pacxpuctanno — ターミナル風のカバー画像"
 order: 4
+group: personal
+thumbnail: ./images/01-home.png
+thumbnailAlt: "トップページ：ヒーローのカルーセルと新しいドロップ"
 ---
 
 ## 課題
