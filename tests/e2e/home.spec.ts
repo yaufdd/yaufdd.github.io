@@ -160,7 +160,8 @@ for (const locale of ['ja', 'en'] as const) {
     expect(line.y, 'description under the title').toBeGreaterThanOrEqual(title.y + title.height - 1);
     await expect(personal.locator('a').first()).toHaveCSS('text-decoration-line', 'none');
     const travelBox = (await travel.boundingBox())!;
-    expect((await personal.boundingBox())!.y, 'personal projects come after the travel company').toBeGreaterThan(travelBox.y + travelBox.height - 1);
+    // A clear gap shows they are separate sections.
+    expect((await personal.boundingBox())!.y - (travelBox.y + travelBox.height), 'space between the two sections').toBeGreaterThanOrEqual(20);
     const button = page.locator('.projects a.all');
     await expect(button).toHaveText(locale === 'ja' ? 'すべてのプロジェクトを見る' : 'See all projects');
     await button.click();

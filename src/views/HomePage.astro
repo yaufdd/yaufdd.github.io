@@ -237,7 +237,10 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     padding-bottom: 0;
     border-bottom: 0;
   }
-  /* The personal projects sit under their label, like the travel company's entry. */
+  /* The personal projects sit under their label, like the travel company's entry, with clear space above. */
+  .projects .personal {
+    margin-top: 14px;
+  }
   .projects .personal ul {
     display: grid;
     gap: 8px;
@@ -254,8 +257,8 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
   }
   .projects a.all {
     display: inline-flex;
-    margin-top: 14px;
-    padding: 7px 16px;
+    margin-top: 10px;
+    padding: 6px 16px;
     border: 1.5px solid var(--fg);
     border-radius: 999px;
     font-size: 12.5px;
@@ -389,7 +392,7 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     .projects {
       grid-area: projects;
       align-self: start;
-      margin-top: 20px;
+      margin-top: 12px;
     }
     /* Tighter on one screen, so four projects and the workflow fit above the contacts. */
     .projects h2 {
@@ -442,7 +445,7 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     }
     .education,
     .experience {
-      margin-top: 20px;
+      margin-top: 12px;
     }
   }
 </style>
