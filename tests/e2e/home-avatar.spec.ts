@@ -5,7 +5,7 @@ const avatar = '[data-avatar]';
 // These tests load the real model (unlike ./fixtures), but like the fixtures they skip Google Fonts:
 // a slow font fetch delays the load event past the test timeout, and nothing here depends on the font.
 test.beforeEach(async ({ page }) => {
-  await page.route(/^https://fonts.(googleapis|gstatic).com//, (route) => route.abort());
+  await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
 });
 
 test('the 3D avatar loads, renders and reacts to a click', async ({ page }) => {
