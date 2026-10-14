@@ -14,15 +14,18 @@ const steps = flow.steps.length;
 // A result that comes from the last step simply follows it in the row; otherwise it hangs under its step.
 const inline = flow.result?.from === steps - 1;
 const cols = inline ? steps + 1 : steps;
+// A result hanging under its step goes below the aside when there is one.
+const resultRow = flow.aside ? 3 : 2;
 ---
 {/*
-  Compact cards in a row joined by arrows (one way, or back and forth). On a phone everything runs top to bottom.
+  Compact cards in a row joined by arrows (one way, or back and forth); an aside hangs under the step it works
+  with, joined back and forth. On a phone everything runs top to bottom (an aside right after its step).
   The arrows are CSS pseudo-elements, hidden from screen readers.
 */}
 <ol class:list={['flow', kind]} style={`--cols: ${cols}`}>
   {
     flow.steps.map((step, i) => (
-      <li class="step" data-link={i < steps - 1 ? step.link : inline ? 'next' : 'none'}>
+      <li class="step" data-link={i < steps - 1 ? step.link : inline ? 'next' : 'none'} data-aside={flow.aside?.to === i ? '' : undefined}>
         <Icon name={step.icon} />
         <b>{step.title}</b>
         {step.note && <span>{step.note}</span>}
@@ -30,8 +33,17 @@ const cols = inline ? steps + 1 : steps;
     ))
   }
   {
+    flow.aside && (
+      <li class="aside" data-link="both" style={`--col: ${flow.aside.to + 1}`}>
+        <Icon name={flow.aside.icon} />
+        <b>{flow.aside.title}</b>
+        {flow.aside.note && <span>{flow.aside.note}</span>}
+      </li>
+    )
+  }
+  {
     flow.result && (
-      <li class:list={['result', { below: !inline }]} style={inline ? undefined : `--col: ${flow.result.from + 1}`}>
+      <li class:list={['result', { below: !inline }]} style={inline ? undefined : `--col: ${flow.result.from + 1}; --row: ${resultRow}`}>
         <Icon name={flow.result.icon} />
         <b>{flow.result.title}</b>
         {flow.result.note && <span>{flow.result.note}</span>}
@@ -92,13 +104,18 @@ const cols = inline ? steps + 1 : steps;
     color: #fff;
   }
   .result.below {
+    grid-row: var(--row);
+    grid-column: var(--col);
+  }
+  .aside {
     grid-row: 2;
     grid-column: var(--col);
   }
 
   /* Arrows: drawn with a mask so they take the text colour. */
   .step:not([data-link='none'])::after,
-  .result.below::before {
+  .result.below::before,
+  .aside::before {
     position: absolute;
     background: var(--fg);
     content: '';
@@ -125,15 +142,43 @@ const cols = inline ? steps + 1 : steps;
     height: 26px;
   }
 
+  .aside::before {
+    --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 48'%3E%3Cpath d='M7 4v40M1 36l6 8 6-8M17 44V4M11 12l6-8 6 8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    bottom: calc(100% + 6px);
+    left: calc(50% - 10px);
+    width: 20px;
+    height: 26px;
+  }
+
   /* Phones: one column, arrows pointing down. */
   @media (max-width: 899px) {
     .flow {
       grid-template-columns: minmax(0, 1fr);
       gap: 40px;
     }
-    .result.below {
+    .result.below,
+    .aside {
       grid-row: auto;
       grid-column: auto;
+    }
+    /* The aside follows its step: the step points at it back and forth, and the aside points on down. */
+    .aside::before {
+      display: none;
+    }
+    .step[data-aside]::after,
+    .flow:has(.result) .aside::after {
+      position: absolute;
+      background: var(--fg);
+      content: '';
+      -webkit-mask: var(--arrow) center / contain no-repeat;
+      mask: var(--arrow) center / contain no-repeat;
+    }
+    .flow:has(.result) .aside::after {
+      --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 48'%3E%3Cpath d='M8 2v40M2 34l6 8 6-8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      top: calc(100% + 6px);
+      left: calc(50% - 7px);
+      width: 14px;
+      height: 28px;
     }
     .step::after {
       --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 48'%3E%3Cpath d='M8 2v40M2 34l6 8 6-8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -142,7 +187,8 @@ const cols = inline ? steps + 1 : steps;
       width: 14px;
       height: 28px;
     }
-    .step[data-link='both']::after {
+    .step[data-link='both']::after,
+    .step[data-aside]::after {
       --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 48'%3E%3Cpath d='M7 4v40M1 36l6 8 6-8M17 44V4M11 12l6-8 6 8' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       top: calc(100% + 6px);
       left: calc(50% - 10px);

@@ -20,9 +20,12 @@ const flow = z
     steps: z.array(card.extend({ link: z.enum(['next', 'both']).default('next') })).min(2).max(5),
     /** What comes out, hanging under the step it comes `from` (0-based). */
     result: card.extend({ from: z.number().int().min(0) }).optional(),
+    /** A helper the step `to` (0-based) works with back and forth, hanging under it (e.g. the AI under the admin panel). */
+    aside: card.extend({ to: z.number().int().min(0) }).optional(),
     note: z.string().min(1).max(140).optional(),
   })
-  .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' });
+  .refine((f) => !f.result || f.result.from < f.steps.length, { message: 'result.from must point at one of the steps' })
+  .refine((f) => !f.aside || f.aside.to < f.steps.length, { message: 'aside.to must point at one of the steps' });
 const story = z.object({
   /** `**…**` marks the words shown in bold (the times saved). */
   task: z.object({ text: z.string().min(1).max(220) }),

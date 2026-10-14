@@ -58,19 +58,23 @@ test('before and now share one section, and the cards are compact', async ({ pag
   expect((await page.locator('#story-change').boundingBox())!.height).toBeLessThan(800);
 });
 
-test('now: online form → admin panel ⇄ AI, and the admin panel hands out the files for the whole group', async ({ page }) => {
+test('now: online form → admin panel → about 10 ready files, with the AI under the admin panel, back and forth', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/en/projects/visa-docs/');
   const flow = page.locator('#story-change .flow.after');
-  await expect(flow.locator('li.step b')).toHaveText(['Online form', 'Admin panel', 'AI (OCR + LLM)']);
-  await expect(flow.locator('li.step').nth(1)).toHaveAttribute('data-link', 'both');
-  await expect(flow.locator('li.step').nth(0)).toHaveAttribute('data-link', 'next');
+  await expect(flow.locator('li.step b')).toHaveText(['Online form', 'Admin panel']);
   await expect(flow.locator('li.result b')).toHaveText('~10 ready files');
-  // On a wide screen the result hangs right under the step it comes from (the admin panel), not after the AI.
+  await expect(flow.locator('li.aside b')).toHaveText('AI (OCR + LLM)');
+  await expect(flow.locator('li.aside')).toHaveAttribute('data-link', 'both');
   const admin = (await flow.locator('li.step').nth(1).boundingBox())!;
-  const result = (await flow.locator('li.result').boundingBox())!;
-  expect(Math.abs(result.x + result.width / 2 - (admin.x + admin.width / 2))).toBeLessThanOrEqual(4);
-  expect(result.y).toBeGreaterThan(admin.y + admin.height);
+  const files = (await flow.locator('li.result').boundingBox())!;
+  const ai = (await flow.locator('li.aside').boundingBox())!;
+  // The files follow the admin panel in the row …
+  expect(Math.abs(files.y - admin.y)).toBeLessThanOrEqual(2);
+  expect(files.x).toBeGreaterThan(admin.x + admin.width);
+  // … and the AI hangs right under the admin panel.
+  expect(Math.abs(ai.x + ai.width / 2 - (admin.x + admin.width / 2))).toBeLessThanOrEqual(4);
+  expect(ai.y).toBeGreaterThan(admin.y + admin.height);
   await expect(page.locator('#story-change .note:not(.pain)')).toContainText('whole set');
 });
 

@@ -23,8 +23,8 @@ story:
   after:
     steps:
       - { icon: smartphone, title: "Online form", note: "travellers fill it in themselves" }
-      - { icon: layout-dashboard, title: "Admin panel", note: "staff only check", link: both }
-      - { icon: sparkles, title: "AI (OCR + LLM)", note: "reads the scans, returns JSON" }
+      - { icon: layout-dashboard, title: "Admin panel", note: "staff only check" }
+    aside: { icon: sparkles, title: "AI (OCR + LLM)", note: "reads the scans, returns JSON", to: 1 }
     result: { icon: folder-check, title: "~10 ready files", note: "for the whole group at once", from: 1 }
     note: "As soon as everyone in the group has filled in the form, the whole set is generated in one go."
   architecture:

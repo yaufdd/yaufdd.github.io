@@ -15,6 +15,7 @@ interface Card {
 interface Flow {
   steps: Card[];
   result?: Card;
+  aside?: Card & { to: number };
   note?: string;
 }
 interface Story {
@@ -39,6 +40,7 @@ const shape = (story: Story) => {
     f && {
       steps: f.steps.map((s) => [s.icon, s.link ?? 'next']),
       result: f.result && [f.result.icon, f.result.from],
+      aside: f.aside && [f.aside.icon, f.aside.to],
       note: Boolean(f.note),
     };
   return {

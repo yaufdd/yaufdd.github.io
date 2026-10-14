@@ -23,8 +23,8 @@ story:
   after:
     steps:
       - { icon: smartphone, title: "オンラインフォーム", note: "旅行者が自分で入力" }
-      - { icon: layout-dashboard, title: "管理画面", note: "担当者は確認するだけ", link: both }
-      - { icon: sparkles, title: "AI（OCR + LLM）", note: "スキャンを読み取り JSON で返す" }
+      - { icon: layout-dashboard, title: "管理画面", note: "担当者は確認するだけ" }
+    aside: { icon: sparkles, title: "AI（OCR + LLM）", note: "スキャンを読み取り JSON で返す", to: 1 }
     result: { icon: folder-check, title: "約 10 個の完成ファイル", note: "グループ全員分を一括生成", from: 1 }
     note: "グループ全員の入力がそろった時点で、書類一式がまとめて生成されます。"
   architecture:
