@@ -19,7 +19,7 @@ story:
       - { icon: user-cog, title: "Staff", note: "edit the quote in Excel" }
       - { icon: files, title: "More and more files", note: "“final_2.xlsx”, “final_3.xlsx”…" }
     result: { icon: triangle-alert, title: "Changes found by eye", note: "prices checked cell by cell", from: 1 }
-    note: "It was hard to tell which version had gone to the client and which prices had changed, and checking took time."
+    note: "Between a traveller's first request and the final quote there are several versions. Staff needed a history of what changed, to show the client when needed and to keep track themselves."
   after:
     steps:
       - { icon: upload, title: "Upload the Excel file", note: "the same Excel as always" }

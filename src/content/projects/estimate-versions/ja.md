@@ -19,7 +19,7 @@ story:
       - { icon: user-cog, title: "担当者", note: "Excel で見積書を修正" }
       - { icon: files, title: "ファイルが増える", note: "「最終版_2.xlsx」「最終版_3.xlsx」…" }
     result: { icon: triangle-alert, title: "変更点は目で探す", note: "金額の差を 1 セルずつ確認", from: 1 }
-    note: "どの版を顧客に送ったのか、どの金額を変えたのかが分かりにくく、確認に時間がかかっていました。"
+    note: "旅行者の最初の問い合わせから最終的な見積もりまでには、いくつもの版ができます。担当者には、必要なときに顧客へ見せるためにも、自分で確認するためにも、どこがどう変わったのかを追える履歴が必要でした。"
   after:
     steps:
       - { icon: upload, title: "Excel をアップロード", note: "いつもの Excel のまま" }

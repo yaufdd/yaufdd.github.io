@@ -36,3 +36,13 @@ test('the screens sit right under the summary, so they are the first thing you s
   await expect(page.locator('#story-cover figure.screens img[src*="quote-diff"]')).toBeVisible();
   await expect(page.locator('.story > figure.screens')).toHaveCount(0);
 });
+
+for (const locale of ['ja', 'en'] as const) {
+  test(`${locale}: the before-row explains why versions matter: many quotes from first request to final, for the client and for staff`, async ({ page }) => {
+    await page.goto(locale === 'ja' ? '/projects/estimate-versions/' : '/en/projects/estimate-versions/');
+    const pain = page.locator('#story-change .note.pain');
+    for (const words of locale === 'ja' ? ['最初の問い合わせ', '最終', '顧客', '自分'] : ['first request', 'final', 'show the client', 'themselves']) {
+      await expect(pain).toContainText(words);
+    }
+  });
+}
