@@ -8,7 +8,14 @@ test.beforeEach(async ({ page }) => {
   await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
 });
 
+/**
+ * CI runners have no GPU: Chromium draws the 350k-triangle model on the CPU, each frame stalls the page for seconds,
+ * and clicks and screenshots time out. These two tests need real rendering, so they run locally only.
+ */
+const NEEDS_GPU = 'needs a GPU; CI runners render WebGL on the CPU';
+
 test('the 3D avatar loads, renders and reacts to a click', async ({ page }) => {
+  test.skip(!!process.env.CI, NEEDS_GPU);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
@@ -49,6 +56,7 @@ async function figureLook(page: Page, empty: Buffer, shot: Buffer): Promise<{ ar
 }
 
 test('the still image looks like the live 3D figure, so swapping one for the other does not flash', async ({ page }) => {
+  test.skip(!!process.env.CI, NEEDS_GPU);
   // Renders the 350k-triangle model on the CPU (headless WebGL) while the rest of the suite runs in parallel.
   test.slow();
   await page.setViewportSize({ width: 375, height: 900 });
