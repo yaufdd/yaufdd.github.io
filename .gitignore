@@ -7,3 +7,9 @@ dist/
 test-results/
 playwright-report/
 forbidden.local.txt
+
+# Terminal Paste Image folder
+.cp-images/
+
+# Working notes (spec, plan): local only, never published
+docs/superpowers/
