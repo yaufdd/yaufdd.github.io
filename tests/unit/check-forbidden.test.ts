@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -111,10 +111,18 @@ describe('history mode (--history <revs>)', () => {
 });
 
 describe('pre-push hook (.githooks/pre-push)', () => {
+  // On macOS and Linux git silently skips a hook that is not executable, so the file mode is part of the gate.
+  it('is committed as an executable file, so git runs it on every platform', () => {
+    const r = spawnSync('git', ['ls-files', '-s', '.githooks/pre-push'], { encoding: 'utf8' });
+    expect(r.stdout.split(' ')[0]).toBe('100755');
+  });
+
   function installHook() {
     for (const file of ['.githooks/pre-push', 'scripts/check-forbidden.mjs', 'scripts/forbidden.mjs']) {
       write(file, readFileSync(resolve(file), 'utf8'));
     }
+    chmodSync(join(repo, '.githooks/pre-push'), 0o755);
+    git('update-index', '--add', '--chmod=+x', '.githooks/pre-push');
     commit('tooling');
     git('config', 'core.hooksPath', '.githooks');
     const remote = mkdtempSync(join(tmpdir(), 'forbidden-remote-'));
