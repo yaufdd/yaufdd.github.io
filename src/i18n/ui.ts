@@ -14,7 +14,7 @@ const ja = {
   'nav.language': '言語',
   'home.hello': 'こんにちは！',
   'home.bio':
-    'はじめまして、番場エリクです。日本生まれ、人生の半分を日本で過ごし、モスクワの技術大学でエンジニアの道に進みました。現在は旅行会社で、社内システムの要件定義から設計・開発・運用までを一人で担当しています。得意なのは、AI（LLM・OCR）を業務の中に組み込む開発です。2027 年に東京へ移住予定です。',
+    'はじめまして、番場エリクです。IT 業界で 3 年の経験を持つフルスタックエンジニアです。AI ツールを開発の中心に据え、常に最新の技術を取り入れながら開発しています。これまで旅行会社で、業務の生産性を高める社内プロダクトを、要件定義から設計・開発・運用まで手がけてきました。',
   'home.enjoy': 'ポートフォリオをぜひご覧ください！',
   'home.projects': 'プロジェクト',
   'home.travelProjects': '旅行会社のプロジェクト',
@@ -84,7 +84,7 @@ const en: Record<UIKey, string> = {
   'nav.language': 'Language',
   'home.hello': 'Hello!',
   'home.bio':
-    "Hi, I'm Eric Bamba. I was born in Japan, have spent half my life there, and studied engineering at a technical university in Moscow. Today I design, build and run the internal systems of a travel company on my own — from requirements to production. My strength is building AI (LLMs and OCR) into everyday business work. I plan to move to Tokyo in 2027.",
+    "Hi, I'm Eric Bamba — a full-stack engineer with 3 years of experience in IT. AI tools sit at the core of how I build, and I keep adopting the latest technologies. At a travel company, I've built internal products that make everyday work more productive, taking each one from requirements through design, development and production.",
   'home.enjoy': 'Hope you enjoy my portfolio!',
   'home.projects': 'Projects',
   'home.travelProjects': 'Projects at a travel company',

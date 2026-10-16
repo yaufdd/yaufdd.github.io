@@ -6,8 +6,6 @@ title: About
 
 I was born in Japan and have spent half my life there, then studied engineering at a technical university in Moscow. Today I design, build and run the internal systems of a travel company on my own. My strength is building AI into everyday business work.
 
-I plan to move to Tokyo in 2027.
-
 ## Experience
 
 - **Sep 2025 – present** — Travel company (custom tours to Japan) / Full-stack engineer, Development<br>My job is to turn work that depended on manual effort into products people actually use — starting with automated visa paperwork. I build and run the internal systems on my own.
