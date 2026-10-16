@@ -8,7 +8,7 @@ async function sitemapPaths(request: APIRequestContext): Promise<string[]> {
 test('sitemap pairs every Japanese page with an English one', async ({ request }) => {
   const paths = await sitemapPaths(request);
   const ja = paths.filter((p) => !p.startsWith('/en/'));
-  expect(ja).toEqual(expect.arrayContaining(['/', '/about/', '/projects/visa-docs/', '/projects/pacxpuctanno/']));
+  expect(ja).toEqual(expect.arrayContaining(['/', '/about/', '/workflow/', '/projects/visa-docs/', '/projects/pacxpuctanno/']));
   for (const p of ja) expect(paths, p).toContain(`/en${p}`);
   expect(paths.filter((p) => p.startsWith('/en/'))).toHaveLength(ja.length);
   expect(paths.some((p) => p.includes('404'))).toBe(false);

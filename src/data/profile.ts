@@ -7,13 +7,13 @@ export interface Job {
   text: Localized;
 }
 
-/** Oldest first, as in the reference design. Source: the owner's Wantedly profile. */
+/** Newest first: the current job on top. Source: the owner's Wantedly profile. */
 export const experience: readonly Job[] = [
   {
-    period: { ja: '2022 – 2023', en: '2022 – 2023' },
+    period: { ja: '2025 – 現在', en: '2025 – Present' },
     text: {
-      ja: '一越株式会社 — フルスタック開発者。ランディングページ、サーバー構築、管理画面の開発。',
-      en: 'Ichikoshi Co., Ltd. — Full-stack developer: landing pages, server setup and an admin panel.',
+      ja: 'Fuji Travel（旅行会社） — 開発部 フルスタックエンジニア。手作業の業務を、実際に使われる製品に変える。',
+      en: 'Fuji Travel (travel company) — Full-stack engineer. Turning manual work into products people actually use.',
     },
   },
   {
@@ -21,10 +21,10 @@ export const experience: readonly Job[] = [
     text: { ja: 'FEAT MUSIC — Go デベロッパー。', en: 'FEAT MUSIC — Go developer.' },
   },
   {
-    period: { ja: '2025 – 現在', en: '2025 – Present' },
+    period: { ja: '2022 – 2023', en: '2022 – 2023' },
     text: {
-      ja: '旅行会社 — 開発部 フルスタックエンジニア。手作業の業務を、実際に使われる製品に変える。',
-      en: 'Travel company — Full-stack engineer. Turning manual work into products people actually use.',
+      ja: '一越株式会社 — フルスタック開発者。ランディングページ、サーバー構築、管理画面の開発。',
+      en: 'Ichikoshi Co., Ltd. — Full-stack developer: landing pages, server setup and an admin panel.',
     },
   },
 ];

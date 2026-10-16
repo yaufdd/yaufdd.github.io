@@ -22,6 +22,11 @@
 .prose li {
   margin-bottom: 6px;
 }
+/* A side note under a section: smaller and grey, so it reads as an aside. */
+.prose .note {
+  color: var(--muted);
+  font-size: 13px;
+}
 .prose code {
   padding: 1px 5px;
   border: 1px solid var(--border);

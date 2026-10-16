@@ -1,0 +1,27 @@
+---
+import '../styles/prose.css';
+import { render } from 'astro:content';
+import type { Locale } from '../i18n/ui';
+import { t } from '../i18n/utils';
+import Base from '../layouts/Base.astro';
+import { getPage } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const { Content } = await render(await getPage('workflow', locale));
+---
+<Base locale={locale} path="workflow/" title={t(locale, 'workflow.title')} description={t(locale, 'workflow.description')}>
+  <article class="container page">
+    <p class="crumb">~/workflow</p>
+    <h1 class="page-title">{t(locale, 'workflow.title')}</h1>
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .page {
+    padding-bottom: 64px;
+  }
+</style>

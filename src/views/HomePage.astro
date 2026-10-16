@@ -14,12 +14,12 @@ interface Props {
 }
 const { locale } = Astro.props;
 const projects = await getProjects(locale);
-// The travel company's systems show as one entry; then the personal projects under their own label; then the workflow.
+// The travel company's systems show as one entry; then the personal projects under their own label.
 const travel = projects.filter((p) => p.data.group === 'travel');
 const personal = projects
   .filter((p) => p.data.group !== 'travel')
   .map((p) => ({ href: localizePath(locale, `projects/${slugOf(p)}/`), label: p.data.title, tagline: p.data.tagline }));
-const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'home.workflowLink'), tagline: t(locale, 'home.workflowTagline') };
+const workflow = { href: localizePath(locale, 'workflow/'), label: t(locale, 'home.workflowLink'), tagline: t(locale, 'home.workflowTagline') };
 ---
 <Base locale={locale} path="" description={t(locale, 'home.bio')} bare>
   <div class="sheet">
@@ -35,41 +35,37 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
 
     <section class="projects" data-reveal style="--i: 2" aria-labelledby="projects-title">
       <h2 id="projects-title">{t(locale, 'home.projects')}</h2>
-      <ul>
-        {
-          travel.length > 0 && (
-            <li class="group travel">
-              <b>{t(locale, 'home.travelProjects')}</b>
-              <span>{t(locale, 'home.travelCount', { n: travel.length })}</span>
-              <a href={localizePath(locale, 'projects/#travel')}>{t(locale, 'home.seeDetails')}</a>
-            </li>
-          )
-        }
-        {
-          personal.length > 0 && (
-            <li class="group personal">
-              <b>{t(locale, 'projects.personal')}</b>
-              <ul>
-                {personal.map((link) => (
-                  <li>
-                    <a href={link.href}>
-                      <b>{link.label} →</b>
-                      <span>{link.tagline}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          )
-        }
-        <li>
-          <a href={workflow.href}>
-            <b>{workflow.label} →</b>
-            <span>{workflow.tagline}</span>
-          </a>
-        </li>
-      </ul>
-      <a class="all" href={localizePath(locale, 'projects/')}>{t(locale, 'home.allProjects')}</a>
+      <div class="list">
+        <ul>
+          {
+            travel.length > 0 && (
+              <li class="group travel">
+                <b>{t(locale, 'home.travelProjects')}</b>
+                <span>{t(locale, 'home.travelCount', { n: travel.length })}</span>
+                <a href={localizePath(locale, 'projects/#travel')}>{t(locale, 'home.seeDetails')}</a>
+              </li>
+            )
+          }
+          {
+            personal.length > 0 && (
+              <li class="group personal">
+                <b>{t(locale, 'projects.personal')}</b>
+                <ul>
+                  {personal.map((link) => (
+                    <li>
+                      <a href={link.href}>
+                        <b>{link.label} →</b>
+                        <span>{link.tagline}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )
+          }
+        </ul>
+        <a class="pill all" href={localizePath(locale, 'projects/')}>{t(locale, 'home.allProjects')}</a>
+      </div>
     </section>
 
     <section class="skills" data-reveal style="--i: 3" aria-labelledby="skills-title">
@@ -89,6 +85,10 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
           ))
         }
       </ul>
+      <a class="workflow" href={workflow.href}>
+        <b>{workflow.label} →</b>
+        <span>{workflow.tagline}</span>
+      </a>
     </section>
 
     <section class="experience" data-reveal style="--i: 4" aria-labelledby="experience-title">
@@ -135,7 +135,10 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
       </li>
     </ul>
 
-    <div class="figure"><Avatar3D label={t(locale, 'home.avatarAlt')} /></div>
+    <div class="figure">
+      <Avatar3D label={t(locale, 'home.avatarAlt')} />
+      <a class="pill about" href={localizePath(locale, 'about/')}>{t(locale, 'home.aboutMe')}</a>
+    </div>
   </div>
 </Base>
 
@@ -248,6 +251,18 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     padding: 0;
     list-style: none;
   }
+  /* Side by side where there is room: the travel company's work on the left, the personal projects on the right. */
+  @media (min-width: 560px) {
+    /* The personal projects keep each description on one line; the travel company's entry takes what is left. */
+    .projects .list > ul {
+      grid-template-columns: minmax(0, max-content) max-content;
+      align-items: start;
+      gap: 0 32px;
+    }
+    .projects .personal {
+      margin-top: 0;
+    }
+  }
   .projects .travel > a {
     display: inline;
     font-size: 12.5px;
@@ -255,19 +270,26 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .projects a.all {
+  /* A round outlined button: "see all projects", "more about me". */
+  a.pill {
     display: inline-flex;
-    margin-top: 10px;
+    justify-self: start;
+    margin-top: 16px;
     padding: 6px 16px;
     border: 1.5px solid var(--fg);
     border-radius: 999px;
+    color: var(--fg);
     font-size: 12.5px;
     font-weight: 700;
+    text-decoration: none;
   }
-  .projects a.all:hover {
+  a.pill:hover {
     background: var(--fg);
     color: #fff;
     opacity: 1;
+  }
+  .projects .list {
+    display: grid;
   }
   .degree {
     margin-bottom: 14px;
@@ -298,6 +320,31 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
   .skills span {
     font-size: 12px;
     font-weight: 800;
+  }
+  /* How I work, under the skill tiles: the same underlined title and grey line as a project. */
+  .skills .workflow {
+    display: grid;
+    gap: 2px;
+    max-width: 200px;
+    margin-top: 16px;
+    color: var(--fg);
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .skills .workflow:hover {
+    opacity: 0.6;
+  }
+  .skills .workflow b {
+    justify-self: start;
+    padding-bottom: 1px;
+    border-bottom: 2px solid var(--fg);
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .skills .workflow span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
   }
   .experience ol {
     display: grid;
@@ -350,9 +397,16 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     stroke-linecap: round;
     stroke-linejoin: round;
   }
+  /* The 3D figure, and under it the way to the personal side of the About page. */
   .figure {
+    display: grid;
+    justify-items: center;
     width: 200px;
     justify-self: center;
+  }
+  .figure a.pill {
+    justify-self: center;
+    margin-top: 8px;
   }
 
   /*
@@ -377,6 +431,7 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
       gap: 0 40px;
       max-width: 1240px;
       min-height: 100dvh;
+      --lower-gap: clamp(16px, calc(10vh - 48px), 56px);
       padding: 44px 0 40px 44px;
     }
     /* Square, exactly the picture, its top level with the greeting; education takes the space under it. */
@@ -392,13 +447,13 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     .projects {
       grid-area: projects;
       align-self: start;
-      margin-top: 12px;
+      margin-top: var(--lower-gap);
     }
-    /* Tighter on one screen, so four projects and the workflow fit above the contacts. */
+    /* Tighter on one screen, so all the projects fit above the contacts. */
     .projects h2 {
       margin-bottom: 8px;
     }
-    .projects ul {
+    .projects ul ul {
       gap: 8px;
     }
     .projects a {
@@ -443,9 +498,10 @@ const workflow = { href: localizePath(locale, 'about/#workflow'), label: t(local
     h1:lang(ja) {
       font-size: clamp(40px, min(8vh, 4.5vw), 64px);
     }
+    /* Room between the top row and the three sections under it; grows with the window, small on short ones. */
     .education,
     .experience {
-      margin-top: 12px;
+      margin-top: var(--lower-gap);
     }
   }
 </style>

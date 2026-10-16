@@ -12,7 +12,8 @@ interface Props {
 const { locale, path, bare = false } = Astro.props;
 const links = [
   { href: localizePath(locale, 'about/'), label: t(locale, 'nav.about') },
-  { href: localizePath(locale, 'about/#workflow'), label: t(locale, 'nav.workflow') },
+  { href: localizePath(locale, 'workflow/'), label: t(locale, 'nav.workflow') },
+  { href: localizePath(locale, 'projects/'), label: t(locale, 'nav.projects') },
 ];
 ---
 <header class:list={['site-header', 'container', { bare }]}>

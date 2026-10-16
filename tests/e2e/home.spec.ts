@@ -34,7 +34,7 @@ function publishedProjects(locale: 'ja' | 'en'): { slug: string; group: string }
 
 /**
  * Links in the home page's project list: the travel company's projects as one entry (to their part of the
- * projects page), each personal project, the workflow, and the button to the projects page.
+ * projects page), each personal project, and the button to the projects page.
  */
 function expectedProjectLinks(locale: 'ja' | 'en'): string[] {
   const prefix = locale === 'ja' ? '/' : '/en/';
@@ -42,7 +42,6 @@ function expectedProjectLinks(locale: 'ja' | 'en'): string[] {
   return [
     ...(projects.some((p) => p.group === 'travel') ? [`${prefix}projects/#travel`] : []),
     ...projects.filter((p) => p.group !== 'travel').map((p) => `${prefix}projects/${p.slug}/`),
-    `${prefix}about/#workflow`,
     `${prefix}projects/`,
   ];
 }
@@ -142,6 +141,35 @@ for (const locale of ['ja', 'en'] as const) {
     await expect(page.locator('.hello img')).toHaveCount(0);
   });
 
+  test(`${locale}: a button under the 3D figure leads to about me`, async ({ page }) => {
+    await open(page, home);
+    const button = page.locator('.figure a.pill.about');
+    await expect(button).toHaveText(locale === 'ja' ? 'わたしについて' : 'About me');
+    await expect(button).toHaveAttribute('href', `${locale === 'ja' ? '/' : '/en/'}about/`);
+    const figure = (await page.locator('[data-avatar]').boundingBox())!;
+    const box = (await button.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(figure.y + figure.height - 1);
+    expect(Math.abs(box.x + box.width / 2 - (figure.x + figure.width / 2))).toBeLessThanOrEqual(2);
+  });
+
+  test(`${locale}: the button to all projects starts at the left, under the two columns`, async ({ page }) => {
+    await open(page, home);
+    const [travel, personal, button] = await Promise.all(
+      ['.projects li.group.travel', '.projects li.group.personal', '.projects a.all'].map(async (s) => (await page.locator(s).boundingBox())!),
+    );
+    expect(Math.abs(button!.x - travel!.x)).toBeLessThanOrEqual(2);
+    expect(button!.y).toBeGreaterThanOrEqual(Math.max(travel!.y + travel!.height, personal!.y + personal!.height));
+  });
+
+  test(`${locale}: the link to how I work sits under the skill tiles`, async ({ page }) => {
+    await open(page, home);
+    const link = page.locator('.skills a.workflow');
+    await expect(link).toHaveAttribute('href', `${locale === 'ja' ? '/' : '/en/'}workflow/`);
+    await expect(link.locator('b')).toHaveText(locale === 'ja' ? '開発スタイル →' : 'How I work →');
+    const tiles = (await page.locator('.skills ul').boundingBox())!;
+    expect((await link.boundingBox())!.y).toBeGreaterThanOrEqual(tiles.y + tiles.height);
+  });
+
   test(`${locale}: the projects section groups the travel company's work, lists the rest, and ends with a button to all projects`, async ({ page }) => {
     await open(page, home);
     const expected = expectedProjectLinks(locale);
@@ -160,8 +188,13 @@ for (const locale of ['ja', 'en'] as const) {
     expect(line.y, 'description under the title').toBeGreaterThanOrEqual(title.y + title.height - 1);
     await expect(personal.locator('a').first()).toHaveCSS('text-decoration-line', 'none');
     const travelBox = (await travel.boundingBox())!;
-    // A clear gap shows they are separate sections.
-    expect((await personal.boundingBox())!.y - (travelBox.y + travelBox.height), 'space between the two sections').toBeGreaterThanOrEqual(20);
+    // Side by side: the travel company's work on the left, the personal projects on the right, tops level, a clear gap.
+    const personalBox = (await personal.boundingBox())!;
+    expect(Math.abs(personalBox.y - travelBox.y), 'tops level').toBeLessThanOrEqual(2);
+    expect(personalBox.x - (travelBox.x + travelBox.width), 'space between the two sections').toBeGreaterThanOrEqual(20);
+    // The projects stay in their own column, clear of the experience next to them.
+    const experience = (await page.locator('.experience').boundingBox())!;
+    expect(personalBox.x + personalBox.width, 'clear of the experience').toBeLessThanOrEqual(experience.x);
     const button = page.locator('.projects a.all');
     await expect(button).toHaveText(locale === 'ja' ? 'すべてのプロジェクトを見る' : 'See all projects');
     await button.click();
@@ -178,9 +211,14 @@ for (const locale of ['ja', 'en'] as const) {
       'PostgreSQL',
       'Docker',
       'AWS',
+      'Python',
+      'Claude Code',
+      'Redis',
     ]);
     await expect(page.locator('.experience li')).toHaveCount(3);
-    await expect(page.locator('.experience li').last()).toContainText(locale === 'ja' ? '旅行会社' : 'Travel company');
+    // Newest first: the current job on top.
+    await expect(page.locator('.experience li').first()).toContainText(locale === 'ja' ? 'Fuji Travel（旅行会社）' : 'Fuji Travel (travel company)');
+    await expect(page.locator('.experience li').last()).toContainText(locale === 'ja' ? '一越株式会社' : 'Ichikoshi');
     await expect(page.locator('.education')).toContainText('MIREA');
     await expect(page.locator('.contacts a[href="mailto:ercbamba@gmail.com"]')).toBeVisible();
     await expect(page.locator('.contacts a[href="https://github.com/yaufdd"]')).toBeVisible();

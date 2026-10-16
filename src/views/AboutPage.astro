@@ -1,6 +1,7 @@
 ---
 import '../styles/prose.css';
 import { render } from 'astro:content';
+import Avatar3D from '../components/Avatar3D.astro';
 import { contacts } from '../data/profile';
 import type { Locale } from '../i18n/ui';
 import { t } from '../i18n/utils';
@@ -12,18 +13,17 @@ interface Props {
 }
 const { locale } = Astro.props;
 const { Content: About } = await render(await getPage('about', locale));
-const { Content: Workflow } = await render(await getPage('workflow', locale));
 ---
 <Base locale={locale} path="about/" title={t(locale, 'about.title')} description={t(locale, 'about.description')}>
   <article class="container page">
-    <p class="crumb">~/about</p>
-    <h1 class="page-title">{t(locale, 'about.title')}</h1>
+    <header class="page-head">
+      <div>
+        <p class="crumb">~/about</p>
+        <h1 class="page-title">{t(locale, 'about.title')}</h1>
+      </div>
+      <div class="figure"><Avatar3D label={t(locale, 'home.avatarAlt')} /></div>
+    </header>
     <div class="prose"><About /></div>
-
-    <section id="workflow" class="prose" aria-labelledby="workflow-title">
-      <h2 id="workflow-title">{t(locale, 'about.workflow')}</h2>
-      <Workflow />
-    </section>
 
     <section class="contacts" aria-labelledby="contacts-title">
       <h2 id="contacts-title" class="section-title">{t(locale, 'about.contacts')}</h2>
@@ -38,6 +38,32 @@ const { Content: Workflow } = await render(await getPage('workflow', locale));
 <style>
   .page {
     padding-bottom: 64px;
+  }
+  /*
+   * The 3D figure sits in the free band between the links above and the text below, so the text stays where it was.
+   * On a phone it stands to the right of the title; from tablets up it is larger and centred under the links.
+   */
+  .page-head {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .figure {
+    flex: none;
+    width: 84px;
+    margin-top: -56px;
+  }
+  @media (min-width: 720px) {
+    .figure {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      width: 108px;
+      margin: 0;
+      transform: translateX(-50%);
+    }
   }
   .contacts {
     margin-top: 48px;

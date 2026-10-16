@@ -8,7 +8,7 @@ I was born in Japan and have spent half my life there, then studied engineering 
 
 ## Experience
 
-- **Sep 2025 – present** — Travel company (custom tours to Japan) / Full-stack engineer, Development<br>My job is to turn work that depended on manual effort into products people actually use — starting with automated visa paperwork. I build and run the internal systems on my own.
+- **Sep 2025 – present** — Fuji Travel (travel company, custom tours to Japan) / Full-stack engineer, Development<br>My job is to turn work that depended on manual effort into products people actually use — starting with automated visa paperwork. I build and run the internal systems on my own.
 - **Feb 2024 – Feb 2025** — FEAT MUSIC / Go developer
 - **Dec 2022 – Dec 2023** — Ichikoshi Co., Ltd. (一越株式会社) / Full-stack developer<br>Landing pages, server setup and an admin panel.
 
@@ -21,3 +21,9 @@ I was born in Japan and have spent half my life there, then studied engineering 
 - Japanese — native
 - Russian — native
 - English — conversational
+
+## Hobbies
+
+- **Watching baseball** — I played baseball as a kid, and now I love watching it
+- **Golf and fishing**
+- **Anime** — *Dragon Ball*, *Kaguya-sama: Love Is War*, *Ace of Diamond*
