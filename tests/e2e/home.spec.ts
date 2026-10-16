@@ -182,11 +182,11 @@ for (const locale of ['ja', 'en'] as const) {
     const personal = page.locator('.projects li.group.personal');
     await expect(personal.locator(':scope > b')).toHaveText(locale === 'ja' ? '個人プロジェクト' : 'Personal projects');
     expect(await personal.locator('a').evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual([`${locale === 'ja' ? '/' : '/en/'}projects/pacxpuctanno/`]);
-    // Each personal project reads like the other entries: its title, and the one-line description under it.
+    // Each personal project reads like the travel company's entry: the one-line description, then the name as a link under it.
     const title = (await personal.locator('a b').first().boundingBox())!;
     const line = (await personal.locator('a span').first().boundingBox())!;
-    expect(line.y, 'description under the title').toBeGreaterThanOrEqual(title.y + title.height - 1);
-    await expect(personal.locator('a').first()).toHaveCSS('text-decoration-line', 'none');
+    expect(title.y, 'name under the description').toBeGreaterThanOrEqual(line.y + line.height - 1);
+    await expect(personal.locator('a b').first()).toHaveCSS('text-decoration-line', 'underline');
     const travelBox = (await travel.boundingBox())!;
     // Side by side: the travel company's work on the left, the personal projects on the right, tops level, a clear gap.
     const personalBox = (await personal.boundingBox())!;

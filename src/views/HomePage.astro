@@ -54,8 +54,8 @@ const workflow = { href: localizePath(locale, 'workflow/'), label: t(locale, 'ho
                   {personal.map((link) => (
                     <li>
                       <a href={link.href}>
-                        <b>{link.label} →</b>
                         <span>{link.tagline}</span>
+                        <b>{link.label} →</b>
                       </a>
                     </li>
                   ))}
@@ -247,9 +247,21 @@ const workflow = { href: localizePath(locale, 'workflow/'), label: t(locale, 'ho
   .projects .personal ul {
     display: grid;
     gap: 8px;
-    margin: 6px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
+  }
+  /* Like the travel company's entry: the description first, then the name as an underlined link. */
+  .projects .personal a {
+    gap: 2px;
+  }
+  .projects .personal a b {
+    padding-bottom: 0;
+    border-bottom: 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   /* Side by side where there is room: the travel company's work on the left, the personal projects on the right. */
   @media (min-width: 560px) {
